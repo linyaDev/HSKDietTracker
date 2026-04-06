@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>HSKDietTracker</name>
+	<author>linyaDev</author>
+	<supportedVersions>
+		<li>1.5</li>
+		<li>1.6</li>
+	</supportedVersions>
+	<packageId>linya.hskdiettracker</packageId>
+	<description>
+[English]
+Tracks food variety for each colonist over the last 15 days. Unique meals (+1) and unique ingredients (+3) contribute to a diet variety score. Diverse diets boost mood, monotonous diets reduce it. Pawns prefer food they haven't eaten recently and food about to spoil.
+
+[Russian]
+Отслеживает разнообразие еды каждого колониста за 15 дней. Уникальные блюда (+1) и ингредиенты (+3) дают очки разнообразия. Разнообразный рацион улучшает настроение, однообразный — ухудшает. Пешки предпочитают еду, которую давно не ели, и еду, которая скоро испортится.
+	</description>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>Ludeon.RimWorld</li>
+	</loadAfter>
+</ModMetaData>

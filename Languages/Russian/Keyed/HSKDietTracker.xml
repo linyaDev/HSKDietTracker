@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<DT_Title>История рациона</DT_Title>
+	<DT_Meals>Блюда</DT_Meals>
+	<DT_Ingredients>Ингредиенты</DT_Ingredients>
+	<DT_ScoreLabel>Очки</DT_ScoreLabel>
+	<DT_TipStats>Уникальных блюд: {0}  |  Уникальных ингредиентов: {1}  |  Очки: {2}</DT_TipStats>
+	<DT_TipStatsShort>Уникальных блюд: {0}  |  Уникальных ингредиентов: {1}</DT_TipStatsShort>
+	<DT_Today>сегодня</DT_Today>
+	<DT_DaysAgo>{0} дн. назад</DT_DaysAgo>
+	<DT_RecentMeals>Съеденные блюда:</DT_RecentMeals>
+	<DT_RecentIngredients>Съеденные ингредиенты:</DT_RecentIngredients>
+	<DT_LastEaten>Последние приёмы пищи:</DT_LastEaten>
+	<DT_ExpiresIn>Истекает через {0}</DT_ExpiresIn>
+	<DT_Stage0>голодный рацион</DT_Stage0>
+	<DT_Stage1>скудный рацион</DT_Stage1>
+	<DT_Stage2>бедный рацион</DT_Stage2>
+	<DT_Stage3>однообразный рацион</DT_Stage3>
+	<DT_Stage4>обычный рацион</DT_Stage4>
+	<DT_Stage5>хороший рацион</DT_Stage5>
+	<DT_Stage6>разнообразный рацион</DT_Stage6>
+	<DT_Stage7>великолепный рацион</DT_Stage7>
+	<DT_NextLevel>до след.: {0} оч.</DT_NextLevel>
+</LanguageData>

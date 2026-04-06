@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<DietVarietyThought.stages.0.label>голодный рацион</DietVarietyThought.stages.0.label>
+	<DietVarietyThought.stages.0.description>Одна и та же отвратительная еда каждый день. Я уже не могу это есть.</DietVarietyThought.stages.0.description>
+	<DietVarietyThought.stages.1.label>скудный рацион</DietVarietyThought.stages.1.label>
+	<DietVarietyThought.stages.1.description>Я ем одно и то же снова и снова. Это угнетает.</DietVarietyThought.stages.1.description>
+	<DietVarietyThought.stages.2.label>бедный рацион</DietVarietyThought.stages.2.label>
+	<DietVarietyThought.stages.2.description>Разнообразия почти нет. Как скучно.</DietVarietyThought.stages.2.description>
+	<DietVarietyThought.stages.3.label>однообразный рацион</DietVarietyThought.stages.3.label>
+	<DietVarietyThought.stages.3.description>Еда становится однообразной. Хочется чего-то другого.</DietVarietyThought.stages.3.description>
+	<DietVarietyThought.stages.4.label>обычный рацион</DietVarietyThought.stages.4.label>
+	<DietVarietyThought.stages.4.description>Разнообразие еды приемлемое. Ничего особенного.</DietVarietyThought.stages.4.description>
+	<DietVarietyThought.stages.5.label>хороший рацион</DietVarietyThought.stages.5.label>
+	<DietVarietyThought.stages.5.description>Приятно, что в последнее время еда разнообразная.</DietVarietyThought.stages.5.description>
+	<DietVarietyThought.stages.6.label>разнообразный рацион</DietVarietyThought.stages.6.label>
+	<DietVarietyThought.stages.6.description>Еда чудесно разнообразна. Каждый приём пищи — удовольствие.</DietVarietyThought.stages.6.description>
+	<DietVarietyThought.stages.7.label>великолепный рацион</DietVarietyThought.stages.7.label>
+	<DietVarietyThought.stages.7.description>Невероятное разнообразие! Чувствую себя как во дворце.</DietVarietyThought.stages.7.description>
+</LanguageData>

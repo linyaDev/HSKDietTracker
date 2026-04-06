@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<DT_Title>Diet History</DT_Title>
+	<DT_Meals>Meals</DT_Meals>
+	<DT_Ingredients>Ingredients</DT_Ingredients>
+	<DT_ScoreLabel>Score</DT_ScoreLabel>
+	<DT_TipStats>Unique meals: {0}  |  Unique ingredients: {1}  |  Score: {2}</DT_TipStats>
+	<DT_TipStatsShort>Unique meals: {0}  |  Unique ingredients: {1}</DT_TipStatsShort>
+	<DT_Today>today</DT_Today>
+	<DT_DaysAgo>{0}d ago</DT_DaysAgo>
+	<DT_RecentMeals>Recent meals:</DT_RecentMeals>
+	<DT_RecentIngredients>Recent ingredients:</DT_RecentIngredients>
+	<DT_LastEaten>Last eaten:</DT_LastEaten>
+	<DT_ExpiresIn>Expires in {0}</DT_ExpiresIn>
+	<DT_Stage0>starving diet</DT_Stage0>
+	<DT_Stage1>meager diet</DT_Stage1>
+	<DT_Stage2>poor diet</DT_Stage2>
+	<DT_Stage3>monotonous diet</DT_Stage3>
+	<DT_Stage4>ordinary diet</DT_Stage4>
+	<DT_Stage5>good diet</DT_Stage5>
+	<DT_Stage6>varied diet</DT_Stage6>
+	<DT_Stage7>magnificent diet</DT_Stage7>
+	<DT_NextLevel>next: {0} pts</DT_NextLevel>
+</LanguageData>

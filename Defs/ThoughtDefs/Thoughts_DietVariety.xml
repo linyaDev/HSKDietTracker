@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<ThoughtDef>
+		<defName>DietVarietyThought</defName>
+		<workerClass>HSKDietTracker.ThoughtWorker_DietVariety</workerClass>
+		<stages>
+			<li>
+				<label>starving diet</label>
+				<description>The same disgusting slop every day. I can barely force it down anymore.</description>
+				<baseMoodEffect>-16</baseMoodEffect>
+			</li>
+			<li>
+				<label>meager diet</label>
+				<description>I've been eating the same slop over and over. It's depressing.</description>
+				<baseMoodEffect>-12</baseMoodEffect>
+			</li>
+			<li>
+				<label>poor diet</label>
+				<description>There's barely any variety in what I eat. So boring.</description>
+				<baseMoodEffect>-8</baseMoodEffect>
+			</li>
+			<li>
+				<label>monotonous diet</label>
+				<description>The food is getting repetitive. I wish for something different.</description>
+				<baseMoodEffect>-4</baseMoodEffect>
+			</li>
+			<li>
+				<label>ordinary diet</label>
+				<description>The food variety is acceptable. Nothing special.</description>
+				<baseMoodEffect>0</baseMoodEffect>
+			</li>
+			<li>
+				<label>good diet</label>
+				<description>Nice to have some variety in meals lately.</description>
+				<baseMoodEffect>2</baseMoodEffect>
+			</li>
+			<li>
+				<label>varied diet</label>
+				<description>The food has been wonderfully diverse. Every meal is a treat.</description>
+				<baseMoodEffect>4</baseMoodEffect>
+			</li>
+			<li>
+				<label>magnificent diet</label>
+				<description>Such an incredible variety of food! I feel like royalty.</description>
+				<baseMoodEffect>6</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+</Defs>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<NeedDef>
+		<defName>Need_DietVariety</defName>
+		<label>diet variety</label>
+		<needClass>HSKDietTracker.Need_DietVariety</needClass>
+		<description>How varied this colonist's diet has been over the last 15 days. Eating different meals and ingredients improves the score.</description>
+		<showOnNeedList>true</showOnNeedList>
+		<minIntelligence>Humanlike</minIntelligence>
+		<colonistAndPrisonersOnly>true</colonistAndPrisonersOnly>
+		<showForCaravanMembers>true</showForCaravanMembers>
+		<listPriority>110</listPriority>
+		<fallPerDay>0</fallPerDay>
+	</NeedDef>
+</Defs>
