@@ -29,6 +29,26 @@ public class Dialog_DietInfo : Window
         absorbInputAroundWindow = false;
     }
 
+    public override void SetInitialSizeAndPosition()
+    {
+        base.SetInitialSizeAndPosition();
+        var s = HSKDietTrackerMod.Settings;
+        if (s != null && s.windowX >= 0f)
+            windowRect.position = new Vector2(s.windowX, s.windowY);
+    }
+
+    public override void PreClose()
+    {
+        base.PreClose();
+        var s = HSKDietTrackerMod.Settings;
+        if (s != null)
+        {
+            s.windowX = windowRect.x;
+            s.windowY = windowRect.y;
+            s.Write();
+        }
+    }
+
     public override void DoWindowContents(Rect inRect)
     {
         // Update pawn if player selected a different one
@@ -67,8 +87,9 @@ public class Dialog_DietInfo : Window
         Widgets.Label(new Rect(thirdW, y + 22f, thirdW, 26f), data.UniqueIngredients.ToString());
         Text.Font = GameFont.Small;
 
-        int neutral = (int)(Need_DietVariety.GetNeutralScore() + Need_DietVariety.GetBiomeBonus());
-        int maxScore = neutral * 2;
+        int maxScore = (int)(Need_DietVariety.GetNeutralScore() + Need_DietVariety.GetBiomeBonus());
+        if (maxScore < 10) maxScore = 10;
+        int neutral = maxScore / 2;
         GUI.color = data.Score >= neutral ? GreenText : new Color(1f, 0.9f, 0.3f);
         Widgets.Label(new Rect(thirdW * 2f, y + 2f, thirdW, 22f), "DT_ScoreLabel".Translate());
         Text.Font = GameFont.Medium;
@@ -79,8 +100,12 @@ public class Dialog_DietInfo : Window
         Text.Anchor = TextAnchor.UpperLeft;
         y += 56f;
 
+        // Grace period info
+        int elapsed = Find.TickManager.TicksGame - data.firstSeenTick;
+        bool inGrace = elapsed < PawnDietData.GracePeriodTicks;
+
         // Progress bar
-        y = DrawDietProgressBar(inRect, y, data.Score, neutral, maxScore);
+        y = DrawDietProgressBar(inRect, y, data.Score, neutral, maxScore, inGrace, elapsed);
 
         // Collect unique meals (only cooked) and ingredients with latest tick
         var mealLatestTick = new Dictionary<string, int>();
@@ -351,7 +376,7 @@ public class Dialog_DietInfo : Window
         "DT_Stage4", "DT_Stage5", "DT_Stage6", "DT_Stage7"
     };
 
-    private float DrawDietProgressBar(Rect inRect, float y, int score, int neutral, int maxScore)
+    private float DrawDietProgressBar(Rect inRect, float y, int score, int neutral, int maxScore, bool inGrace = false, int graceElapsed = 0)
     {
         float barHeight = 18f;
         float barX = 20f;
@@ -413,6 +438,22 @@ public class Dialog_DietInfo : Window
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
         y += 24f;
+
+        // Grace period label
+        if (inGrace)
+        {
+            int daysLeft = (PawnDietData.GracePeriodTicks - graceElapsed) / 60000;
+            if (daysLeft < 1) daysLeft = 1;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            GUI.color = new Color(0.5f, 0.8f, 1f);
+            Rect graceRect = new Rect(0f, y, inRect.width, 20f);
+            Widgets.Label(graceRect, "DT_GracePeriod".Translate(daysLeft));
+            if (Mouse.IsOver(graceRect))
+                TooltipHandler.TipRegion(graceRect, "DT_GracePeriodTooltip".Translate());
+            GUI.color = Color.white;
+            Text.Anchor = TextAnchor.UpperLeft;
+            y += 24f;
+        }
 
         return y;
     }

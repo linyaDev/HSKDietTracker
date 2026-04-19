@@ -14,44 +14,42 @@ public class Need_DietVariety : Need
         if (biome == null)
             return 0;
 
-        string name = biome.defName;
-
-        // Forest, tropical, swamp/bog: +10
-        if (name.Contains("Forest") || name.Contains("forest")
-            || name.Contains("Jungle") || name.Contains("jungle")
-            || name.Contains("Tropical") || name.Contains("tropical")
-            || name.Contains("Swamp") || name.Contains("swamp")
-            || name.Contains("Bog") || name.Contains("bog"))
-            return 10;
-
-        // Tundra: +10
-        if (name.Contains("Tundra") || name.Contains("tundra"))
-            return 10;
-
-        // Desert, ice, arid: -5
-        if (name.Contains("Desert") || name.Contains("desert")
-            || name.Contains("Ice") || name.Contains("ice")
-            || name.Contains("Arid") || name.Contains("arid"))
-            return -5;
+        if (BiomeBonusLoader.BiomeBonuses.TryGetValue(biome.defName, out int bonus))
+            return bonus;
 
         return 0;
     }
 
     public static float GetNeutralScore()
     {
+        var s = HSKDietTrackerMod.Settings;
         var techLevel = Faction.OfPlayer?.def?.techLevel ?? TechLevel.Neolithic;
-        switch (techLevel)
+
+        int epochMax;
+        if (s != null)
         {
-            case TechLevel.Animal:
-            case TechLevel.Neolithic:
-                return 15f;
-            case TechLevel.Medieval:
-                return 25f;
-            case TechLevel.Industrial:
-                return 35f;
-            default:
-                return 45f;
+            switch (techLevel)
+            {
+                case TechLevel.Animal:
+                case TechLevel.Neolithic: epochMax = s.epochNeolithic; break;
+                case TechLevel.Medieval: epochMax = s.epochMedieval; break;
+                case TechLevel.Industrial: epochMax = s.epochIndustrial; break;
+                default: epochMax = s.epochSpacer; break;
+            }
         }
+        else
+        {
+            switch (techLevel)
+            {
+                case TechLevel.Animal:
+                case TechLevel.Neolithic: epochMax = 30; break;
+                case TechLevel.Medieval: epochMax = 40; break;
+                case TechLevel.Industrial: epochMax = 50; break;
+                default: epochMax = 60; break;
+            }
+        }
+
+        return epochMax;
     }
 
     private static Texture2D cachedInfoIcon;
@@ -61,7 +59,9 @@ public class Need_DietVariety : Need
     {
     }
 
-    public override bool ShowOnNeedList => true;
+    private bool IsGuest => pawn.Faction != Faction.OfPlayer || pawn.IsQuestLodger();
+
+    public override bool ShowOnNeedList => !IsGuest;
 
     public override int GUIChangeArrow => 0;
 
@@ -72,15 +72,30 @@ public class Need_DietVariety : Need
 
     public override void NeedInterval()
     {
+        if (IsGuest)
+            return;
+
         var comp = Current.Game?.GetComponent<GameComponent_DietTracker>();
         if (comp == null)
             return;
 
         var data = comp.GetData(pawn);
-        float neutral = GetNeutralScore() + GetBiomeBonus();
-        float maxScore = neutral * 2f;
+        float maxScore = GetNeutralScore() + GetBiomeBonus();
+        if (maxScore < 10f) maxScore = 10f;
         float score = Mathf.Clamp(data.Score, 0f, maxScore);
-        CurLevel = score / maxScore;
+        float realLevel = score / maxScore;
+
+        // Grace period: blend from 0.5 to real value over 3 days
+        int elapsed = Find.TickManager.TicksGame - data.firstSeenTick;
+        if (elapsed < PawnDietData.GracePeriodTicks)
+        {
+            float t = (float)elapsed / PawnDietData.GracePeriodTicks;
+            CurLevel = Mathf.Lerp(0.5f, realLevel, t);
+        }
+        else
+        {
+            CurLevel = realLevel;
+        }
     }
 
     public override string GetTipString()

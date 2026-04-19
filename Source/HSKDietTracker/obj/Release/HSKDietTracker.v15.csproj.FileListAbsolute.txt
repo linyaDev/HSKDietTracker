@@ -1,8 +1,0 @@
-D:\Mods\HSKDietTracker\1.5\Assemblies\HSKDietTracker.dll
-D:\Mods\HSKDietTracker\1.5\Assemblies\HSKDietTracker.pdb
-D:\Mods\HSKDietTracker\Source\HSKDietTracker\obj\Release\HSKDietTracker.v15.csproj.AssemblyReference.cache
-D:\Mods\HSKDietTracker\Source\HSKDietTracker\obj\Release\HSKDietTracker.v15.IgnoresAccessChecksTo.cs
-D:\Mods\HSKDietTracker\Source\HSKDietTracker\obj\Release\HSKDietTracker.v15.GeneratedMSBuildEditorConfig.editorconfig
-D:\Mods\HSKDietTracker\Source\HSKDietTracker\obj\Release\HSKDietTracker.v15.csproj.CoreCompileInputs.cache
-D:\Mods\HSKDietTracker\Source\HSKDietTracker\obj\Release\HSKDietTracker.dll
-D:\Mods\HSKDietTracker\Source\HSKDietTracker\obj\Release\HSKDietTracker.pdb

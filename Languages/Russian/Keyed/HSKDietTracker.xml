@@ -8,8 +8,8 @@
 	<DT_TipStatsShort>Уникальных блюд: {0}  |  Уникальных ингредиентов: {1}</DT_TipStatsShort>
 	<DT_Today>сегодня</DT_Today>
 	<DT_DaysAgo>{0} дн. назад</DT_DaysAgo>
-	<DT_RecentMeals>Съеденные блюда:</DT_RecentMeals>
-	<DT_RecentIngredients>Съеденные ингредиенты:</DT_RecentIngredients>
+	<DT_RecentMeals>Съеденные блюда: (+1 оч.)</DT_RecentMeals>
+	<DT_RecentIngredients>Съеденные ингредиенты: (+3 оч.)</DT_RecentIngredients>
 	<DT_LastEaten>Последние приёмы пищи:</DT_LastEaten>
 	<DT_ExpiresIn>Истекает через {0}</DT_ExpiresIn>
 	<DT_Stage0>голодный рацион</DT_Stage0>
@@ -21,4 +21,20 @@
 	<DT_Stage6>разнообразный рацион</DT_Stage6>
 	<DT_Stage7>великолепный рацион</DT_Stage7>
 	<DT_NextLevel>до след.: {0} оч.</DT_NextLevel>
+	<DT_SettingsCategory>Трекер диеты</DT_SettingsCategory>
+	<DT_SettingsEpoch>Максимум очков по эпохам</DT_SettingsEpoch>
+	<DT_EpochNeolithic>Неолит</DT_EpochNeolithic>
+	<DT_EpochMedieval>Средневековье</DT_EpochMedieval>
+	<DT_EpochIndustrial>Индустрия</DT_EpochIndustrial>
+	<DT_EpochSpacer>Космос+</DT_EpochSpacer>
+	<DT_SettingsBiome>Бонус от биома</DT_SettingsBiome>
+	<DT_CurrentBiome>Текущий биом</DT_CurrentBiome>
+	<DT_FormulaInfo>Эпоха: {0} + Биом: {1} = Максимум: {2}, Нейтраль: {3}</DT_FormulaInfo>
+	<DT_NoBiome>Биом недоступен (нет карты)</DT_NoBiome>
+	<DT_OverlayOn>Показать животных</DT_OverlayOn>
+	<DT_OverlayOff>Скрыть животных</DT_OverlayOff>
+	<DT_OverlayToggle>Подсветка диеты: показать животных, мясо которых колонисты ещё не ели</DT_OverlayToggle>
+	<DT_AllBiomes>Настроенные бонусы биомов:</DT_AllBiomes>
+	<DT_GracePeriod>Адаптация ({0} дн.)</DT_GracePeriod>
+	<DT_GracePeriodTooltip>Этот колонист недавно прибыл. Штраф к настроению от диеты снижен на 3 дня, пока он привыкает к еде колонии.</DT_GracePeriodTooltip>
 </LanguageData>

@@ -9,10 +9,10 @@
 	<packageId>linya.hskdiettracker</packageId>
 	<description>
 [English]
-Tracks food variety for each colonist over the last 15 days. Unique meals (+1) and unique ingredients (+3) contribute to a diet variety score. Diverse diets boost mood, monotonous diets reduce it. Pawns prefer food they haven't eaten recently and food about to spoil.
+7-day food variety tracker. Colonists remember what they ate and want diverse food. Variety boosts mood (+6), monotony penalizes heavily (up to -16). New colonists get a 3-day grace period. Required variety scales with tech level and biome.
 
 [Russian]
-Отслеживает разнообразие еды каждого колониста за 15 дней. Уникальные блюда (+1) и ингредиенты (+3) дают очки разнообразия. Разнообразный рацион улучшает настроение, однообразный — ухудшает. Пешки предпочитают еду, которую давно не ели, и еду, которая скоро испортится.
+Трекер разнообразия еды за 7 дней. Колонисты запоминают что ели и хотят разнообразную еду. Разнообразие повышает настроение (+6), однообразие сильно ухудшает (до -16). Новые колонисты получают 3 дня адаптации. Требуемое разнообразие зависит от уровня технологий и биома.
 	</description>
 	<modDependencies>
 		<li>

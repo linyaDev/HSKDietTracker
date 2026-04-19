@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Diet Tracker: Biome bonuses to max score.
+    Max score = epoch base + biome bonus.
+    Neutral = max / 2.
+
+    Add new biomes here or modify existing values.
+    Biomes not listed get bonus = 0.
+-->
+<BiomeBonuses>
+    <!-- Forests: +20 -->
+    <BorealForest>10</BorealForest>
+    <TemperateForest>20</TemperateForest>
+    <DenseBorealForest>10</DenseBorealForest>
+    <DenseTemperateForest>20</DenseTemperateForest>
+
+    <!-- Tropical: +20 -->
+    <TropicalRainforest>20</TropicalRainforest>
+    <TropicalSwamp>20</TropicalSwamp>
+
+    <!-- Swamp/Bog: +20 -->
+    <TemperateSwamp>20</TemperateSwamp>
+    <ColdBog>20</ColdBog>
+
+    <!-- Tundra/Taiga: +10 -->
+    <Tundra>10</Tundra>
+
+    <!-- Arid: -10 -->
+    <AridShrubland>-10</AridShrubland>
+    <Desert>-10</Desert>
+    <ExtremeDesert>-10</ExtremeDesert>
+
+    <!-- Ice: -10 -->
+    <IceSheet>-10</IceSheet>
+    <SeaIce>-10</SeaIce>
+</BiomeBonuses>

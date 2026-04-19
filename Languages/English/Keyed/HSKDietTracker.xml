@@ -8,8 +8,8 @@
 	<DT_TipStatsShort>Unique meals: {0}  |  Unique ingredients: {1}</DT_TipStatsShort>
 	<DT_Today>today</DT_Today>
 	<DT_DaysAgo>{0}d ago</DT_DaysAgo>
-	<DT_RecentMeals>Recent meals:</DT_RecentMeals>
-	<DT_RecentIngredients>Recent ingredients:</DT_RecentIngredients>
+	<DT_RecentMeals>Recent meals: (+1 pt.)</DT_RecentMeals>
+	<DT_RecentIngredients>Recent ingredients: (+3 pt.)</DT_RecentIngredients>
 	<DT_LastEaten>Last eaten:</DT_LastEaten>
 	<DT_ExpiresIn>Expires in {0}</DT_ExpiresIn>
 	<DT_Stage0>starving diet</DT_Stage0>
@@ -21,4 +21,20 @@
 	<DT_Stage6>varied diet</DT_Stage6>
 	<DT_Stage7>magnificent diet</DT_Stage7>
 	<DT_NextLevel>next: {0} pts</DT_NextLevel>
+	<DT_SettingsCategory>Diet Tracker</DT_SettingsCategory>
+	<DT_SettingsEpoch>Max score by tech level</DT_SettingsEpoch>
+	<DT_EpochNeolithic>Neolithic</DT_EpochNeolithic>
+	<DT_EpochMedieval>Medieval</DT_EpochMedieval>
+	<DT_EpochIndustrial>Industrial</DT_EpochIndustrial>
+	<DT_EpochSpacer>Spacer+</DT_EpochSpacer>
+	<DT_SettingsBiome>Biome bonus</DT_SettingsBiome>
+	<DT_CurrentBiome>Current biome</DT_CurrentBiome>
+	<DT_FormulaInfo>Epoch: {0} + Biome: {1} = Max: {2}, Neutral: {3}</DT_FormulaInfo>
+	<DT_NoBiome>Biome unavailable (no map)</DT_NoBiome>
+	<DT_OverlayOn>Show animals</DT_OverlayOn>
+	<DT_OverlayOff>Hide animals</DT_OverlayOff>
+	<DT_OverlayToggle>Toggle diet overlay: highlight animals whose meat your colonists haven't eaten</DT_OverlayToggle>
+	<DT_AllBiomes>Configured biome bonuses:</DT_AllBiomes>
+	<DT_GracePeriod>Adapting ({0}d left)</DT_GracePeriod>
+	<DT_GracePeriodTooltip>This colonist recently arrived. Diet mood penalty is reduced for 3 days while they adapt to the colony's food.</DT_GracePeriodTooltip>
 </LanguageData>

@@ -26,10 +26,12 @@ public class DietRecord : IExposable
 public class PawnDietData : IExposable
 {
     public List<DietRecord> records = new List<DietRecord>();
+    public int firstSeenTick = -1;
 
     public const int MealWeight = 1;
     public const int IngredientWeight = 3;
     private const int SevenDaysTicks = 420000;
+    public const int GracePeriodTicks = 180000; // 3 days
 
     private IEnumerable<DietRecord> ValidRecords
     {
@@ -76,6 +78,7 @@ public class PawnDietData : IExposable
     public void ExposeData()
     {
         Scribe_Collections.Look(ref records, "records", LookMode.Deep);
+        Scribe_Values.Look(ref firstSeenTick, "firstSeenTick", -1);
         if (records == null)
             records = new List<DietRecord>();
     }
@@ -95,9 +98,11 @@ public class GameComponent_DietTracker : GameComponent
     {
         if (!pawnData.TryGetValue(pawn.thingIDNumber, out var data))
         {
-            data = new PawnDietData();
+            data = new PawnDietData { firstSeenTick = Find.TickManager.TicksGame };
             pawnData[pawn.thingIDNumber] = data;
         }
+        if (data.firstSeenTick < 0)
+            data.firstSeenTick = data.records.Count > 0 ? 0 : Find.TickManager.TicksGame;
         return data;
     }
 

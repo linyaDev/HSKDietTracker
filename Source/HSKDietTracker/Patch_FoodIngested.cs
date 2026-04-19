@@ -11,7 +11,7 @@ public static class Patch_FoodIngested
 {
     public static void Postfix(Thing __instance, Pawn ingester)
     {
-        if (ingester == null || !ingester.IsColonist)
+        if (ingester == null || !ingester.IsColonist || ingester.IsQuestLodger())
             return;
 
         if (__instance.def?.ingestible == null)
