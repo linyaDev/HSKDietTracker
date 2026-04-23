@@ -37,4 +37,5 @@
 	<DT_AllBiomes>Configured biome bonuses:</DT_AllBiomes>
 	<DT_GracePeriod>Adapting ({0}d left)</DT_GracePeriod>
 	<DT_GracePeriodTooltip>This colonist recently arrived. Diet mood penalty is reduced for 3 days while they adapt to the colony's food.</DT_GracePeriodTooltip>
+	<DT_SmallColony>Too few of us to be picky about food</DT_SmallColony>
 </LanguageData>

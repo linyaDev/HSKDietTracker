@@ -85,6 +85,14 @@ public class Need_DietVariety : Need
         float score = Mathf.Clamp(data.Score, 0f, maxScore);
         float realLevel = score / maxScore;
 
+        // Small colony: too few to be picky
+        int colonistCount = PawnsFinder.AllMaps_FreeColonistsSpawned.Count;
+        if (colonistCount < 3)
+        {
+            CurLevel = 0.5f;
+            return;
+        }
+
         // Grace period: blend from 0.5 to real value over 3 days
         int elapsed = Find.TickManager.TicksGame - data.firstSeenTick;
         if (elapsed < PawnDietData.GracePeriodTicks)
@@ -103,8 +111,20 @@ public class Need_DietVariety : Need
         var sb = new StringBuilder();
         sb.AppendLine(def.LabelCap);
         sb.AppendLine();
-        sb.AppendLine(def.description);
 
+        int colonistCount = PawnsFinder.AllMaps_FreeColonistsSpawned.Count;
+        if (colonistCount < 3)
+        {
+            sb.AppendLine("DT_SmallColony".Translate());
+        }
+        else
+        {
+            int elapsed = Find.TickManager.TicksGame - (Current.Game?.GetComponent<GameComponent_DietTracker>()?.GetData(pawn)?.firstSeenTick ?? 0);
+            if (elapsed < PawnDietData.GracePeriodTicks)
+                sb.AppendLine("DT_GracePeriod".Translate());
+            else
+                sb.AppendLine(def.description);
+        }
 
         return sb.ToString();
     }
