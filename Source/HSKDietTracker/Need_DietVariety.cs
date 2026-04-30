@@ -59,7 +59,40 @@ public class Need_DietVariety : Need
     {
     }
 
-    private bool IsGuest => pawn.Faction != Faction.OfPlayer || pawn.IsQuestLodger();
+    private bool IsGuest => pawn.Faction != Faction.OfPlayer || pawn.IsQuestLodger() || IsExcluded(pawn);
+
+    private static bool? _androidModLoaded;
+    private static TraitDef _bodyMasteryDef;
+    private static HediffDef _inhumanizedDef;
+    private static bool _bodyMasteryChecked;
+
+    private static bool IsExcluded(Pawn p)
+    {
+        // Androids
+        _androidModLoaded ??= DefDatabase<ThingDef>.GetNamedSilentFail("ChjAndroid") != null;
+        if (_androidModLoaded.Value)
+        {
+            var defName = p.def.defName;
+            if (defName == "ChjAndroid" || defName == "ChjDroid" || defName == "ChjBattleDroid")
+                return true;
+        }
+
+        // Body Mastery (Anomaly) — no food needed
+        if (!_bodyMasteryChecked)
+        {
+            _bodyMasteryChecked = true;
+            _bodyMasteryDef = DefDatabase<TraitDef>.GetNamedSilentFail("BodyMastery");
+            _inhumanizedDef = DefDatabase<HediffDef>.GetNamedSilentFail("Inhumanized");
+        }
+        if (_bodyMasteryDef != null && p.story?.traits?.HasTrait(_bodyMasteryDef) == true)
+            return true;
+
+        // Inhumanized (Anomaly)
+        if (_inhumanizedDef != null && p.health?.hediffSet?.HasHediff(_inhumanizedDef) == true)
+            return true;
+
+        return false;
+    }
 
     public override bool ShowOnNeedList => !IsGuest;
 

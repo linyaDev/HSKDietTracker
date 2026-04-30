@@ -38,4 +38,5 @@
 	<DT_GracePeriod>Адаптация ({0} дн.)</DT_GracePeriod>
 	<DT_GracePeriodTooltip>Этот колонист недавно прибыл. Штраф к настроению от диеты снижен на 3 дня, пока он привыкает к еде колонии.</DT_GracePeriodTooltip>
 	<DT_SmallColony>Нас слишком мало, не до изысков</DT_SmallColony>
+	<DT_SmallColonyTooltip>В колонии меньше 3 человек. Штрафы и бонусы от диеты не действуют.</DT_SmallColonyTooltip>
 </LanguageData>

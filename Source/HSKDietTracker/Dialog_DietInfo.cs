@@ -100,12 +100,14 @@ public class Dialog_DietInfo : Window
         Text.Anchor = TextAnchor.UpperLeft;
         y += 56f;
 
-        // Grace period info
+        // Small colony info
+        // Grace period / small colony info
         int elapsed = Find.TickManager.TicksGame - data.firstSeenTick;
         bool inGrace = elapsed < PawnDietData.GracePeriodTicks;
+        bool smallColony = PawnsFinder.AllMaps_FreeColonistsSpawned.Count < 3;
 
         // Progress bar
-        y = DrawDietProgressBar(inRect, y, data.Score, neutral, maxScore, inGrace, elapsed);
+        y = DrawDietProgressBar(inRect, y, data.Score, neutral, maxScore, inGrace, elapsed, smallColony);
 
         // Collect unique meals (only cooked) and ingredients with latest tick
         var mealLatestTick = new Dictionary<string, int>();
@@ -376,7 +378,7 @@ public class Dialog_DietInfo : Window
         "DT_Stage4", "DT_Stage5", "DT_Stage6", "DT_Stage7"
     };
 
-    private float DrawDietProgressBar(Rect inRect, float y, int score, int neutral, int maxScore, bool inGrace = false, int graceElapsed = 0)
+    private float DrawDietProgressBar(Rect inRect, float y, int score, int neutral, int maxScore, bool inGrace = false, int graceElapsed = 0, bool smallColony = false)
     {
         float barHeight = 18f;
         float barX = 20f;
@@ -439,8 +441,20 @@ public class Dialog_DietInfo : Window
         Text.Anchor = TextAnchor.UpperLeft;
         y += 24f;
 
-        // Grace period label
-        if (inGrace)
+        // Small colony / grace period label
+        if (smallColony)
+        {
+            Text.Anchor = TextAnchor.MiddleCenter;
+            GUI.color = new Color(0.5f, 0.8f, 1f);
+            Rect smallRect = new Rect(0f, y, inRect.width, 20f);
+            Widgets.Label(smallRect, "DT_SmallColony".Translate());
+            if (Mouse.IsOver(smallRect))
+                TooltipHandler.TipRegion(smallRect, "DT_SmallColonyTooltip".Translate());
+            GUI.color = Color.white;
+            Text.Anchor = TextAnchor.UpperLeft;
+            y += 24f;
+        }
+        else if (inGrace)
         {
             int daysLeft = (PawnDietData.GracePeriodTicks - graceElapsed) / 60000;
             if (daysLeft < 1) daysLeft = 1;
