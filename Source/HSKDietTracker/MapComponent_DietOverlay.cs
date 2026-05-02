@@ -199,6 +199,10 @@ public class MapComponent_DietOverlay : MapComponent
             if (animal.Faction != null)
                 continue;
 
+            // Skip aggressive/manhunter animals
+            if (animal.InAggroMentalState || animal.MentalStateDef == MentalStateDefOf.Manhunter || animal.MentalStateDef == MentalStateDefOf.ManhunterPermanent)
+                continue;
+
             string meatDef = animal.RaceProps.meatDef?.defName;
             string raceDef = animal.def.defName;
 

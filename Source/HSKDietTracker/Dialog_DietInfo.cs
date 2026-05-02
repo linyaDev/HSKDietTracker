@@ -265,7 +265,6 @@ public class Dialog_DietInfo : Window
             // 1. uiIcon
             if (!drawn && def.uiIcon != null && def.uiIcon != BaseContent.BadTex)
             {
-                Log.Message($"[DietTracker] {def.defName}: uiIcon found, size={def.uiIcon.width}x{def.uiIcon.height}, name={def.uiIcon.name}");
                 GUI.DrawTexture(innerRect, def.uiIcon, ScaleMode.ScaleToFit);
                 drawn = true;
             }
@@ -275,7 +274,6 @@ public class Dialog_DietInfo : Window
             {
                 foreach (var cat in def.thingCategories)
                 {
-                    Log.Message($"[DietTracker] {def.defName}: category={cat.defName}, hasIcon={cat.icon != null}, iconName={cat.icon?.name}, iconSize={cat.icon?.width}x{cat.icon?.height}, isBadTex={cat.icon == BaseContent.BadTex}");
                     if (cat.icon != null && cat.icon != BaseContent.BadTex)
                     {
                         GUI.DrawTexture(innerRect, cat.icon, ScaleMode.ScaleToFit);
@@ -285,10 +283,6 @@ public class Dialog_DietInfo : Window
                 }
             }
 
-            if (!drawn)
-            {
-                Log.Message($"[DietTracker] {def.defName}: NO ICON FOUND. uiIcon={def.uiIcon != null}, graphicData={def.graphicData != null}, categories={def.thingCategories?.Count ?? 0}");
-            }
 
             // 3. parent race icon (for Corpse_, Meat_, Leather_)
             if (!drawn && def.ingestible?.sourceDef?.uiIcon != null && def.ingestible.sourceDef.uiIcon != BaseContent.BadTex)

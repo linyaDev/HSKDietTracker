@@ -10,6 +10,5 @@ public static class HSKDietTrackerInit
     {
         var harmony = new Harmony("linya.hskdiettracker");
         harmony.PatchAll();
-        Log.Message("[HSKDietTracker] Patches applied.");
     }
 }

@@ -46,7 +46,6 @@ public static class BiomeBonusLoader
                     }
                 }
 
-                Log.Message($"[HSKDietTracker] Loaded {BiomeBonuses.Count} biome bonuses.");
             }
             catch (System.Exception e)
             {
