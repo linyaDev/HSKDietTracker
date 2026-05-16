@@ -138,8 +138,7 @@ public class Dialog_DietInfo : Window
         float iconsPerRow = Mathf.Floor((inRect.width - 16f) / (IconSize + IconPadding));
         float mealsHeight = 30f + Mathf.Ceil(mealLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
         float ingredientsHeight = 30f + Mathf.Ceil(ingredientLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
-        float recentHeight = 30f + Mathf.Min(data.records.Count, 8) * 28f;
-        float totalHeight = mealsHeight + ingredientsHeight + recentHeight + 20f;
+        float totalHeight = mealsHeight + ingredientsHeight + 20f;
 
         Rect outRect = new Rect(0f, y, inRect.width, inRect.height - y - 50f);
         Rect viewRect = new Rect(0f, 0f, inRect.width - 16f, totalHeight);
@@ -172,47 +171,20 @@ public class Dialog_DietInfo : Window
         contentY = DrawIconGrid(viewRect.width, contentY, ingredientLatestTick);
         contentY += 10f;
 
-        // Separator
-        GUI.color = new Color(1f, 1f, 1f, 0.2f);
-        Widgets.DrawLineHorizontal(0f, contentY, viewRect.width);
-        GUI.color = Color.white;
-        contentY += 6f;
-
-        // === Recent meals list ===
-        GUI.color = DimText;
-        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_LastEaten".Translate());
-        GUI.color = Color.white;
-        contentY += 28f;
-
-        int showCount = Mathf.Min(data.records.Count, 8);
-        for (int i = data.records.Count - 1; i >= data.records.Count - showCount; i--)
-        {
-            var r = data.records[i];
-            ThingDef mealDef = DefDatabase<ThingDef>.GetNamedSilentFail(r.mealDef);
-            string mealLabel = mealDef?.LabelCap ?? r.mealDef;
-
-            int daysAgo = (Find.TickManager.TicksGame - r.tick) / 60000;
-            string timeStr = daysAgo <= 0 ? "DT_Today".Translate().RawText : "DT_DaysAgo".Translate(daysAgo).RawText;
-
-            // Meal icon
-            if (mealDef != null)
-            {
-                Rect iconRect = new Rect(0f, contentY, 24f, 24f);
-                Widgets.ThingIcon(iconRect, mealDef);
-            }
-
-            Widgets.Label(new Rect(28f, contentY, viewRect.width - 150f, 26f), mealLabel);
-
-            GUI.color = DimText;
-            Text.Anchor = TextAnchor.MiddleRight;
-            Widgets.Label(new Rect(viewRect.width - 115f, contentY, 110f, 26f), timeStr);
-            Text.Anchor = TextAnchor.UpperLeft;
-            GUI.color = Color.white;
-
-            contentY += 28f;
-        }
-
         Widgets.EndScrollView();
+
+        // History button
+        float btnWidth = 120f;
+        float btnHeight = 30f;
+        Rect btnRect = new Rect(inRect.width - btnWidth, inRect.height - 44f, btnWidth, btnHeight);
+        if (Widgets.ButtonText(btnRect, "DT_HistoryBtn".Translate()))
+        {
+            var existing = Find.WindowStack.WindowOfType<Dialog_DietHistory>();
+            if (existing != null)
+                existing.Close();
+            else
+                Find.WindowStack.Add(new Dialog_DietHistory(pawn, windowRect));
+        }
     }
 
 
