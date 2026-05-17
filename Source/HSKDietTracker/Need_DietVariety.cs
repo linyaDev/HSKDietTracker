@@ -115,8 +115,8 @@ public class Need_DietVariety : Need
         var data = comp.GetData(pawn);
         float maxScore = GetNeutralScore() + GetBiomeBonus();
         if (maxScore < 10f) maxScore = 10f;
-        float score = Mathf.Clamp(data.Score, 0f, maxScore);
-        float realLevel = score / maxScore;
+        float score = Mathf.Clamp(data.Score, 0f, maxScore) + data.LuxuryScore;
+        float realLevel = Mathf.Clamp01(score / maxScore);
 
         // Small colony: too few to be picky
         int colonistCount = PawnsFinder.AllMaps_FreeColonistsSpawned.Count;

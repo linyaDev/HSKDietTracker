@@ -18,7 +18,7 @@ public class Dialog_DietInfo : Window
     private const float IconSize = 48f;
     private const float IconPadding = 4f;
 
-    public override Vector2 InitialSize => new Vector2(480f, 600f);
+    public override Vector2 InitialSize => new Vector2(480f, 680f);
 
     public Dialog_DietInfo(Pawn pawn)
     {
@@ -64,8 +64,21 @@ public class Dialog_DietInfo : Window
 
         // Title with pawn name
         Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(0f, 0f, inRect.width, 35f), "DT_Title".Translate() + " — " + pawn.LabelShortCap);
+        Widgets.Label(new Rect(0f, 0f, inRect.width - 130f, 35f), "DT_Title".Translate() + " — " + pawn.LabelShortCap);
         Text.Font = GameFont.Small;
+
+        // History button (top right, aligned with title)
+        float btnWidth = 120f;
+        float btnHeight = 28f;
+        Rect btnRect = new Rect(inRect.width - btnWidth - 4f, 3f, btnWidth, btnHeight);
+        if (Widgets.ButtonText(btnRect, "DT_HistoryBtn".Translate()))
+        {
+            var existing = Find.WindowStack.WindowOfType<Dialog_DietHistory>();
+            if (existing != null)
+                existing.Close();
+            else
+                Find.WindowStack.Add(new Dialog_DietHistory(pawn, windowRect));
+        }
 
         float y = 40f;
 
@@ -73,27 +86,36 @@ public class Dialog_DietInfo : Window
         Rect statsRect = new Rect(0f, y, inRect.width, 50f);
         Widgets.DrawBoxSolid(statsRect, new Color(0.15f, 0.15f, 0.15f, 0.8f));
 
-        float thirdW = inRect.width / 3f;
+        float colW = inRect.width / 4f;
         Text.Anchor = TextAnchor.MiddleCenter;
 
         GUI.color = GreenText;
-        Widgets.Label(new Rect(0f, y + 2f, thirdW, 22f), "DT_Meals".Translate());
+        Widgets.Label(new Rect(0f, y + 2f, colW, 22f), "DT_Meals".Translate());
         Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(0f, y + 22f, thirdW, 26f), data.UniqueMeals.ToString());
+        Widgets.Label(new Rect(0f, y + 22f, colW, 26f), data.UniqueMeals.ToString());
         Text.Font = GameFont.Small;
 
-        Widgets.Label(new Rect(thirdW, y + 2f, thirdW, 22f), "DT_Ingredients".Translate());
+        Widgets.Label(new Rect(colW, y + 2f, colW, 22f), "DT_Ingredients".Translate());
         Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(thirdW, y + 22f, thirdW, 26f), data.UniqueIngredients.ToString());
+        Widgets.Label(new Rect(colW, y + 22f, colW, 26f), data.UniqueIngredients.ToString());
+        Text.Font = GameFont.Small;
+
+        int totalSlots = LuxurySlotLoader.TotalSlots;
+        int filledSlots = data.TotalFilledSlots;
+        GUI.color = filledSlots > 0 ? GreenText : DimText;
+        Widgets.Label(new Rect(colW * 2f, y + 2f, colW, 22f), "DT_Luxury".Translate());
+        Text.Font = GameFont.Medium;
+        Widgets.Label(new Rect(colW * 2f, y + 22f, colW, 26f), filledSlots + " / " + totalSlots);
         Text.Font = GameFont.Small;
 
         int maxScore = (int)(Need_DietVariety.GetNeutralScore() + Need_DietVariety.GetBiomeBonus());
         if (maxScore < 10) maxScore = 10;
         int neutral = maxScore / 2;
-        GUI.color = data.Score >= neutral ? GreenText : new Color(1f, 0.9f, 0.3f);
-        Widgets.Label(new Rect(thirdW * 2f, y + 2f, thirdW, 22f), "DT_ScoreLabel".Translate());
+        int totalScore = data.Score + data.LuxuryScore;
+        GUI.color = totalScore >= neutral ? GreenText : new Color(1f, 0.9f, 0.3f);
+        Widgets.Label(new Rect(colW * 3f, y + 2f, colW, 22f), "DT_ScoreLabel".Translate());
         Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(thirdW * 2f, y + 22f, thirdW, 26f), data.Score + " / " + maxScore);
+        Widgets.Label(new Rect(colW * 3f, y + 22f, colW, 26f), totalScore + " / " + maxScore);
         Text.Font = GameFont.Small;
 
         GUI.color = Color.white;
@@ -107,7 +129,7 @@ public class Dialog_DietInfo : Window
         bool smallColony = PawnsFinder.AllMaps_FreeColonistsSpawned.Count < 3;
 
         // Progress bar
-        y = DrawDietProgressBar(inRect, y, data.Score, neutral, maxScore, inGrace, elapsed, smallColony);
+        y = DrawDietProgressBar(inRect, y, totalScore, neutral, maxScore, inGrace, elapsed, smallColony);
 
         // Collect unique meals (only cooked) and ingredients with latest tick
         var mealLatestTick = new Dictionary<string, int>();
@@ -138,7 +160,8 @@ public class Dialog_DietInfo : Window
         float iconsPerRow = Mathf.Floor((inRect.width - 16f) / (IconSize + IconPadding));
         float mealsHeight = 30f + Mathf.Ceil(mealLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
         float ingredientsHeight = 30f + Mathf.Ceil(ingredientLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
-        float totalHeight = mealsHeight + ingredientsHeight + 20f;
+        float luxuryHeight = 30f + LuxCellSize + LuxCellPadding + 16f;
+        float totalHeight = mealsHeight + ingredientsHeight + luxuryHeight + 20f;
 
         Rect outRect = new Rect(0f, y, inRect.width, inRect.height - y - 50f);
         Rect viewRect = new Rect(0f, 0f, inRect.width - 16f, totalHeight);
@@ -171,20 +194,22 @@ public class Dialog_DietInfo : Window
         contentY = DrawIconGrid(viewRect.width, contentY, ingredientLatestTick);
         contentY += 10f;
 
+        // Separator
+        GUI.color = new Color(1f, 1f, 1f, 0.2f);
+        Widgets.DrawLineHorizontal(0f, contentY, viewRect.width);
+        GUI.color = Color.white;
+        contentY += 6f;
+
+        // === Luxury slots section ===
+        GUI.color = GreenText;
+        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_LuxurySlots".Translate());
+        GUI.color = Color.white;
+        contentY += 28f;
+
+        contentY = DrawLuxurySlots(viewRect.width, contentY, data);
+
         Widgets.EndScrollView();
 
-        // History button
-        float btnWidth = 120f;
-        float btnHeight = 30f;
-        Rect btnRect = new Rect(inRect.width - btnWidth, inRect.height - 44f, btnWidth, btnHeight);
-        if (Widgets.ButtonText(btnRect, "DT_HistoryBtn".Translate()))
-        {
-            var existing = Find.WindowStack.WindowOfType<Dialog_DietHistory>();
-            if (existing != null)
-                existing.Close();
-            else
-                Find.WindowStack.Add(new Dialog_DietHistory(pawn, windowRect));
-        }
     }
 
 
@@ -323,6 +348,105 @@ public class Dialog_DietInfo : Window
         }
 
         return y + IconSize + IconPadding;
+    }
+
+    private static readonly Color LuxuryFilledBg = new Color(0.15f, 0.4f, 0.15f, 0.7f);
+    private static readonly Color LuxuryEmptyBg = new Color(0.15f, 0.15f, 0.15f, 0.6f);
+    private const float LuxCellSize = 72f;
+    private const float LuxCellPadding = 6f;
+    private const float LuxIconArea = 40f;
+
+    private float DrawLuxurySlots(float width, float startY, PawnDietData data)
+    {
+        float x = 0f;
+        float y = startY;
+
+        foreach (var cat in LuxurySlotLoader.Categories)
+        {
+            var filledItems = data.FilledLuxuryItems(cat.name);
+            string catLabel = cat.labelKey.Translate();
+
+            for (int slot = 0; slot < cat.slots; slot++)
+            {
+                if (x + LuxCellSize > width)
+                {
+                    x = 0f;
+                    y += LuxCellSize + LuxCellPadding;
+                }
+
+                Rect cellRect = new Rect(x, y, LuxCellSize, LuxCellSize);
+                bool isFilled = slot < filledItems.Count;
+
+                // Background
+                Widgets.DrawBoxSolid(cellRect, isFilled ? LuxuryFilledBg : LuxuryEmptyBg);
+
+                // Border
+                GUI.color = isFilled ? GreenText : new Color(1f, 1f, 1f, 0.15f);
+                Widgets.DrawBox(cellRect, 1);
+                GUI.color = Color.white;
+
+                // Icon area (top half)
+                Rect iconArea = new Rect(x + (LuxCellSize - LuxIconArea) / 2f, y + 4f, LuxIconArea, LuxIconArea);
+
+                if (isFilled)
+                {
+                    ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail(filledItems[slot]);
+                    if (def?.uiIcon != null && def.uiIcon != BaseContent.BadTex)
+                        GUI.DrawTexture(iconArea, def.uiIcon, ScaleMode.ScaleToFit);
+
+                    // Checkmark overlay (top-left)
+                    GUI.color = GreenText;
+                    Text.Font = GameFont.Tiny;
+                    Text.Anchor = TextAnchor.UpperLeft;
+                    Widgets.Label(new Rect(x + 3f, y + 1f, 16f, 16f), "\u2713");
+                    Text.Anchor = TextAnchor.UpperLeft;
+                    Text.Font = GameFont.Small;
+                    GUI.color = Color.white;
+                }
+
+                // Label (bottom, centered)
+                GUI.color = isFilled ? GreenText : DimText;
+                Text.Font = GameFont.Tiny;
+                Text.Anchor = TextAnchor.MiddleCenter;
+                Text.WordWrap = true;
+                Widgets.Label(new Rect(x + 2f, y + LuxCellSize - 24f, LuxCellSize - 4f, 20f), catLabel);
+                Text.WordWrap = false;
+                Text.Font = GameFont.Small;
+                Text.Anchor = TextAnchor.UpperLeft;
+                GUI.color = Color.white;
+
+                // Points overlay (top-right)
+                GUI.color = isFilled ? GreenText : DimText;
+                Text.Font = GameFont.Tiny;
+                Text.Anchor = TextAnchor.UpperRight;
+                Widgets.Label(new Rect(x, y + 1f, LuxCellSize - 3f, 16f), "+" + cat.pointsPerSlot);
+                Text.Anchor = TextAnchor.UpperLeft;
+                Text.Font = GameFont.Small;
+                GUI.color = Color.white;
+
+                // Tooltip
+                if (Mouse.IsOver(cellRect))
+                {
+                    string status = data.FilledSlots(cat.name) + "/" + cat.slots;
+                    var itemLines = cat.items.Select(i =>
+                    {
+                        var d = DefDatabase<ThingDef>.GetNamedSilentFail(i);
+                        string label = d?.LabelCap.RawText ?? i;
+                        bool consumed = filledItems.Contains(i);
+                        return (consumed ? "\u2713 " : "   ") + label;
+                    });
+                    string tip = catLabel + " (" + status + ")\n\n" + "DT_LuxuryItems".Translate() + "\n" + string.Join("\n", itemLines);
+                    TooltipHandler.TipRegion(cellRect, tip);
+                }
+
+                x += LuxCellSize + LuxCellPadding;
+            }
+
+            // Gap between categories
+            x += 4f;
+        }
+
+        return y + LuxCellSize + LuxCellPadding;
     }
 
     private static readonly int[] DietMoods = { -16, -12, -8, -4, 0, 2, 4, 6 };

@@ -17,15 +17,31 @@ public static class Patch_FoodIngested
         if (__instance.def?.ingestible == null)
             return;
 
-        // Skip drugs, medicine, non-food
-        if (__instance.def.IsDrug || __instance.def.ingestible.preferability <= FoodPreferability.NeverForNutrition)
-            return;
-
         var comp = Current.Game?.GetComponent<GameComponent_DietTracker>();
         if (comp == null)
             return;
 
         string mealDef = __instance.def.defName;
+
+        // Check luxury: first by XML list, then by auto-detection
+        if (LuxurySlotLoader.AllLuxuryDefNames.Contains(mealDef))
+        {
+            comp.RecordLuxury(ingester, mealDef);
+            return;
+        }
+
+        // Auto-detect alcohol/smoking by chemical properties
+        string detected = LuxurySlotLoader.DetectCategory(__instance.def);
+        if (detected != null)
+        {
+            comp.RecordLuxury(ingester, mealDef, detected);
+            Log.Message("[HSKDietTracker] Auto-detected luxury: " + mealDef + " as " + detected);
+            return;
+        }
+
+        // Skip drugs, medicine, non-food
+        if (__instance.def.IsDrug || __instance.def.ingestible.preferability <= FoodPreferability.NeverForNutrition)
+            return;
 
         var compIngredients = __instance.TryGetComp<CompIngredients>();
         List<string> ingredients = compIngredients?.ingredients?

@@ -41,4 +41,11 @@
 	<DT_SmallColonyTooltip>В колонии меньше 3 человек. Штрафы и бонусы от диеты не действуют.</DT_SmallColonyTooltip>
 	<DT_IngredientsTip>Ингредиенты:</DT_IngredientsTip>
 	<DT_HistoryBtn>История</DT_HistoryBtn>
+	<DT_Luxury>Удовольствия</DT_Luxury>
+	<DT_LuxurySlots>Удовольствия: (+5 оч. каждый)</DT_LuxurySlots>
+	<DT_LuxuryItems>Подходят:</DT_LuxuryItems>
+	<DT_LuxAlcohol>Спиртное</DT_LuxAlcohol>
+	<DT_LuxDrinks>Напитки</DT_LuxDrinks>
+	<DT_LuxSweets>Сладости</DT_LuxSweets>
+	<DT_LuxSmoking>Курение</DT_LuxSmoking>
 </LanguageData>

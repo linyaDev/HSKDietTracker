@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace HSKDietTracker;
@@ -23,9 +24,24 @@ public class DietRecord : IExposable
     }
 }
 
+public class LuxuryRecord : IExposable
+{
+    public int tick;
+    public string defName;
+    public string category;
+
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref tick, "tick");
+        Scribe_Values.Look(ref defName, "defName");
+        Scribe_Values.Look(ref category, "category");
+    }
+}
+
 public class PawnDietData : IExposable
 {
     public List<DietRecord> records = new List<DietRecord>();
+    public List<LuxuryRecord> luxuryRecords = new List<LuxuryRecord>();
     public int firstSeenTick = -1;
 
     public const int MealWeight = 1;
@@ -39,6 +55,15 @@ public class PawnDietData : IExposable
         {
             int cutoff = Find.TickManager.TicksGame - SevenDaysTicks + 2500; // 1 hour buffer
             return records.Where(r => r.tick >= cutoff);
+        }
+    }
+
+    private IEnumerable<LuxuryRecord> ValidLuxuryRecords
+    {
+        get
+        {
+            int cutoff = Find.TickManager.TicksGame - SevenDaysTicks + 2500;
+            return luxuryRecords.Where(r => r.tick >= cutoff);
         }
     }
 
@@ -69,6 +94,52 @@ public class PawnDietData : IExposable
 
     public int Score => UniqueMeals * MealWeight + UniqueIngredients * IngredientWeight;
 
+    public int LuxuryScore
+    {
+        get
+        {
+            int total = 0;
+            foreach (var cat in LuxurySlotLoader.Categories)
+            {
+                int filled = FilledSlots(cat.name);
+                total += filled * cat.pointsPerSlot;
+            }
+            return total;
+        }
+    }
+
+    public int FilledSlots(string categoryName)
+    {
+        var cat = LuxurySlotLoader.Categories.Find(c => c.name == categoryName);
+        if (cat == null) return 0;
+        int unique = ValidLuxuryRecords
+            .Where(r => r.category == categoryName)
+            .Select(r => r.defName)
+            .Distinct()
+            .Count();
+        return Mathf.Min(unique, cat.slots);
+    }
+
+    public List<string> FilledLuxuryItems(string categoryName)
+    {
+        return ValidLuxuryRecords
+            .Where(r => r.category == categoryName)
+            .Select(r => r.defName)
+            .Distinct()
+            .ToList();
+    }
+
+    public int TotalFilledSlots
+    {
+        get
+        {
+            int total = 0;
+            foreach (var cat in LuxurySlotLoader.Categories)
+                total += FilledSlots(cat.name);
+            return total;
+        }
+    }
+
     public bool HasEatenMeal(string mealDefName)
     {
         int cutoff = Find.TickManager.TicksGame - SevenDaysTicks;
@@ -78,9 +149,12 @@ public class PawnDietData : IExposable
     public void ExposeData()
     {
         Scribe_Collections.Look(ref records, "records", LookMode.Deep);
+        Scribe_Collections.Look(ref luxuryRecords, "luxuryRecords", LookMode.Deep);
         Scribe_Values.Look(ref firstSeenTick, "firstSeenTick", -1);
         if (records == null)
             records = new List<DietRecord>();
+        if (luxuryRecords == null)
+            luxuryRecords = new List<LuxuryRecord>();
     }
 }
 
@@ -118,6 +192,24 @@ public class GameComponent_DietTracker : GameComponent
         });
     }
 
+    public void RecordLuxury(Pawn pawn, string defName)
+    {
+        if (!LuxurySlotLoader.DefToCategory.TryGetValue(defName, out string category))
+            return;
+        RecordLuxury(pawn, defName, category);
+    }
+
+    public void RecordLuxury(Pawn pawn, string defName, string category)
+    {
+        var data = GetData(pawn);
+        data.luxuryRecords.Add(new LuxuryRecord
+        {
+            tick = Find.TickManager.TicksGame,
+            defName = defName,
+            category = category
+        });
+    }
+
     public override void GameComponentTick()
     {
         cleanupCounter++;
@@ -129,6 +221,7 @@ public class GameComponent_DietTracker : GameComponent
         foreach (var data in pawnData.Values)
         {
             data.records.RemoveAll(r => r.tick < cutoff);
+            data.luxuryRecords.RemoveAll(r => r.tick < cutoff);
         }
     }
 

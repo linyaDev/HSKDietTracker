@@ -41,4 +41,11 @@
 	<DT_SmallColonyTooltip>Colony has fewer than 3 people. Diet mood penalties and bonuses are disabled.</DT_SmallColonyTooltip>
 	<DT_IngredientsTip>Ingredients:</DT_IngredientsTip>
 	<DT_HistoryBtn>History</DT_HistoryBtn>
+	<DT_Luxury>Luxury</DT_Luxury>
+	<DT_LuxurySlots>Luxury slots: (+5 pt. each)</DT_LuxurySlots>
+	<DT_LuxuryItems>Items:</DT_LuxuryItems>
+	<DT_LuxAlcohol>Alcohol</DT_LuxAlcohol>
+	<DT_LuxDrinks>Drinks</DT_LuxDrinks>
+	<DT_LuxSweets>Sweets</DT_LuxSweets>
+	<DT_LuxSmoking>Smoking</DT_LuxSmoking>
 </LanguageData>
