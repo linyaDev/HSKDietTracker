@@ -129,6 +129,18 @@ public class PawnDietData : IExposable
             .ToList();
     }
 
+    public Dictionary<string, int> FilledLuxuryItemsWithTicks(string categoryName)
+    {
+        var result = new Dictionary<string, int>();
+        foreach (var r in ValidLuxuryRecords)
+        {
+            if (r.category != categoryName) continue;
+            if (!result.ContainsKey(r.defName) || r.tick > result[r.defName])
+                result[r.defName] = r.tick;
+        }
+        return result;
+    }
+
     public int TotalFilledSlots
     {
         get

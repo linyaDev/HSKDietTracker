@@ -8,8 +8,8 @@
 	<DT_TipStatsShort>Unique meals: {0}  |  Unique ingredients: {1}</DT_TipStatsShort>
 	<DT_Today>today</DT_Today>
 	<DT_DaysAgo>{0}d ago</DT_DaysAgo>
-	<DT_RecentMeals>Recent meals: (+1 pt.)</DT_RecentMeals>
-	<DT_RecentIngredients>Recent ingredients: (+3 pt.)</DT_RecentIngredients>
+	<DT_RecentMeals>Meals: {0} (+1 pt.)</DT_RecentMeals>
+	<DT_RecentIngredients>Ingredients: {0} (+3 pt.)</DT_RecentIngredients>
 	<DT_LastEaten>Last eaten:</DT_LastEaten>
 	<DT_ExpiresIn>Expires in {0}</DT_ExpiresIn>
 	<DT_Stage0>starving diet</DT_Stage0>

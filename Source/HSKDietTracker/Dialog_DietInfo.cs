@@ -172,7 +172,7 @@ public class Dialog_DietInfo : Window
         // === Meals section ===
         Text.Font = GameFont.Small;
         GUI.color = GreenText;
-        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_RecentMeals".Translate());
+        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_RecentMeals".Translate(mealLatestTick.Count));
         GUI.color = Color.white;
         contentY += 28f;
 
@@ -187,7 +187,7 @@ public class Dialog_DietInfo : Window
 
         // === Ingredients section ===
         GUI.color = GreenText;
-        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_RecentIngredients".Translate());
+        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_RecentIngredients".Translate(ingredientLatestTick.Count));
         GUI.color = Color.white;
         contentY += 28f;
 
@@ -356,14 +356,18 @@ public class Dialog_DietInfo : Window
     private const float LuxCellPadding = 6f;
     private const float LuxIconArea = 40f;
 
+    private static readonly Color LuxuryTimerColor = new Color(0.3f, 0.85f, 0.3f, 0.35f);
+
     private float DrawLuxurySlots(float width, float startY, PawnDietData data)
     {
         float x = 0f;
         float y = startY;
+        int now = Find.TickManager.TicksGame;
 
         foreach (var cat in LuxurySlotLoader.Categories)
         {
-            var filledItems = data.FilledLuxuryItems(cat.name);
+            var filledItemTicks = data.FilledLuxuryItemsWithTicks(cat.name);
+            var filledItems = filledItemTicks.Keys.ToList();
             string catLabel = cat.labelKey.Translate();
 
             for (int slot = 0; slot < cat.slots; slot++)
@@ -378,14 +382,24 @@ public class Dialog_DietInfo : Window
                 bool isFilled = slot < filledItems.Count;
 
                 // Background
-                Widgets.DrawBoxSolid(cellRect, isFilled ? LuxuryFilledBg : LuxuryEmptyBg);
+                Widgets.DrawBoxSolid(cellRect, LuxuryEmptyBg);
+
+                // Timer progress bar (green, top to bottom) for filled slots
+                if (isFilled)
+                {
+                    int itemTick = filledItemTicks[filledItems[slot]];
+                    int ticksLeft = itemTick + SevenDaysTicks - now;
+                    float fillPct = Mathf.Clamp01((float)ticksLeft / SevenDaysTicks);
+                    float fillHeight = (LuxCellSize - 2f) * fillPct;
+                    Widgets.DrawBoxSolid(new Rect(x + 1f, y + 1f, LuxCellSize - 2f, fillHeight), LuxuryTimerColor);
+                }
 
                 // Border
                 GUI.color = isFilled ? GreenText : new Color(1f, 1f, 1f, 0.15f);
                 Widgets.DrawBox(cellRect, 1);
                 GUI.color = Color.white;
 
-                // Icon area (top half)
+                // Icon area (upper center)
                 Rect iconArea = new Rect(x + (LuxCellSize - LuxIconArea) / 2f, y + 4f, LuxIconArea, LuxIconArea);
 
                 if (isFilled)
@@ -393,15 +407,6 @@ public class Dialog_DietInfo : Window
                     ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail(filledItems[slot]);
                     if (def?.uiIcon != null && def.uiIcon != BaseContent.BadTex)
                         GUI.DrawTexture(iconArea, def.uiIcon, ScaleMode.ScaleToFit);
-
-                    // Checkmark overlay (top-left)
-                    GUI.color = GreenText;
-                    Text.Font = GameFont.Tiny;
-                    Text.Anchor = TextAnchor.UpperLeft;
-                    Widgets.Label(new Rect(x + 3f, y + 1f, 16f, 16f), "\u2713");
-                    Text.Anchor = TextAnchor.UpperLeft;
-                    Text.Font = GameFont.Small;
-                    GUI.color = Color.white;
                 }
 
                 // Label (bottom, centered)
@@ -435,7 +440,18 @@ public class Dialog_DietInfo : Window
                         bool consumed = filledItems.Contains(i);
                         return (consumed ? "\u2713 " : "   ") + label;
                     });
-                    string tip = catLabel + " (" + status + ")\n\n" + "DT_LuxuryItems".Translate() + "\n" + string.Join("\n", itemLines);
+
+                    string tip = catLabel + " (" + status + ")";
+                    if (isFilled)
+                    {
+                        int itemTick = filledItemTicks[filledItems[slot]];
+                        int tLeft = itemTick + SevenDaysTicks - now;
+                        int dLeft = tLeft / 60000;
+                        int hLeft = (tLeft % 60000) / 2500;
+                        string timeLeft = dLeft > 0 ? dLeft + "d " + hLeft + "h" : hLeft + "h";
+                        tip += "\n" + "DT_ExpiresIn".Translate(timeLeft);
+                    }
+                    tip += "\n\n" + "DT_LuxuryItems".Translate() + "\n" + string.Join("\n", itemLines);
                     TooltipHandler.TipRegion(cellRect, tip);
                 }
 
