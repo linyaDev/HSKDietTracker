@@ -44,6 +44,8 @@
 	<DT_Luxury>Удовольствия</DT_Luxury>
 	<DT_LuxurySlots>Удовольствия: (+5 оч. каждый)</DT_LuxurySlots>
 	<DT_LuxuryItems>Подходят:</DT_LuxuryItems>
+	<DT_SettingsLuxury>Удовольствия (спиртное, напитки, сладости, курение)</DT_SettingsLuxury>
+	<DT_SettingsLuxuryTip>Включить бонусные очки за употребление предметов удовольствия. Каждый заполненный слот даёт +5 очков поверх максимума.</DT_SettingsLuxuryTip>
 	<DT_LuxAlcohol>Спиртное</DT_LuxAlcohol>
 	<DT_LuxDrinks>Напитки</DT_LuxDrinks>
 	<DT_LuxSweets>Сладости</DT_LuxSweets>

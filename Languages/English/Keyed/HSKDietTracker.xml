@@ -44,6 +44,8 @@
 	<DT_Luxury>Luxury</DT_Luxury>
 	<DT_LuxurySlots>Luxury slots: (+5 pt. each)</DT_LuxurySlots>
 	<DT_LuxuryItems>Items:</DT_LuxuryItems>
+	<DT_SettingsLuxury>Luxury slots (alcohol, drinks, sweets, smoking)</DT_SettingsLuxury>
+	<DT_SettingsLuxuryTip>Enable bonus points for consuming luxury items. Each filled slot gives +5 points on top of max score.</DT_SettingsLuxuryTip>
 	<DT_LuxAlcohol>Alcohol</DT_LuxAlcohol>
 	<DT_LuxDrinks>Drinks</DT_LuxDrinks>
 	<DT_LuxSweets>Sweets</DT_LuxSweets>

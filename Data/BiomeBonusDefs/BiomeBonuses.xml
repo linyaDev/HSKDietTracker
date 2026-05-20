@@ -26,7 +26,7 @@
     <Tundra>10</Tundra>
 
     <!-- Arid: -10 -->
-    <AridShrubland>-10</AridShrubland>
+    <AridShrubland>20</AridShrubland>
     <Desert>-10</Desert>
     <ExtremeDesert>-10</ExtremeDesert>
 

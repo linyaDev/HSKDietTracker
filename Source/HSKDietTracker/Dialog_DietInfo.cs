@@ -86,7 +86,8 @@ public class Dialog_DietInfo : Window
         Rect statsRect = new Rect(0f, y, inRect.width, 50f);
         Widgets.DrawBoxSolid(statsRect, new Color(0.15f, 0.15f, 0.15f, 0.8f));
 
-        float colW = inRect.width / 4f;
+        bool luxuryOn = HSKDietTrackerMod.Settings?.luxuryEnabled ?? true;
+        float colW = inRect.width / (luxuryOn ? 4f : 3f);
         Text.Anchor = TextAnchor.MiddleCenter;
 
         GUI.color = GreenText;
@@ -100,22 +101,27 @@ public class Dialog_DietInfo : Window
         Widgets.Label(new Rect(colW, y + 22f, colW, 26f), data.UniqueIngredients.ToString());
         Text.Font = GameFont.Small;
 
-        int totalSlots = LuxurySlotLoader.TotalSlots;
-        int filledSlots = data.TotalFilledSlots;
-        GUI.color = filledSlots > 0 ? GreenText : DimText;
-        Widgets.Label(new Rect(colW * 2f, y + 2f, colW, 22f), "DT_Luxury".Translate());
-        Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(colW * 2f, y + 22f, colW, 26f), filledSlots + " / " + totalSlots);
-        Text.Font = GameFont.Small;
+        int scoreColIdx = 2;
+        if (luxuryOn)
+        {
+            int totalSlots = LuxurySlotLoader.TotalSlots;
+            int filledSlots = data.TotalFilledSlots;
+            GUI.color = filledSlots > 0 ? GreenText : DimText;
+            Widgets.Label(new Rect(colW * 2f, y + 2f, colW, 22f), "DT_Luxury".Translate());
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(colW * 2f, y + 22f, colW, 26f), filledSlots + " / " + totalSlots);
+            Text.Font = GameFont.Small;
+            scoreColIdx = 3;
+        }
 
         int maxScore = (int)(Need_DietVariety.GetNeutralScore() + Need_DietVariety.GetBiomeBonus());
         if (maxScore < 10) maxScore = 10;
         int neutral = maxScore / 2;
-        int totalScore = data.Score + data.LuxuryScore;
+        int totalScore = data.Score + (luxuryOn ? data.LuxuryScore : 0);
         GUI.color = totalScore >= neutral ? GreenText : new Color(1f, 0.9f, 0.3f);
-        Widgets.Label(new Rect(colW * 3f, y + 2f, colW, 22f), "DT_ScoreLabel".Translate());
+        Widgets.Label(new Rect(colW * scoreColIdx, y + 2f, colW, 22f), "DT_ScoreLabel".Translate());
         Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(colW * 3f, y + 22f, colW, 26f), totalScore + " / " + maxScore);
+        Widgets.Label(new Rect(colW * scoreColIdx, y + 22f, colW, 26f), totalScore + " / " + maxScore);
         Text.Font = GameFont.Small;
 
         GUI.color = Color.white;
@@ -160,7 +166,7 @@ public class Dialog_DietInfo : Window
         float iconsPerRow = Mathf.Floor((inRect.width - 16f) / (IconSize + IconPadding));
         float mealsHeight = 30f + Mathf.Ceil(mealLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
         float ingredientsHeight = 30f + Mathf.Ceil(ingredientLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
-        float luxuryHeight = 30f + LuxCellSize + LuxCellPadding + 16f;
+        float luxuryHeight = luxuryOn ? 30f + LuxCellSize + LuxCellPadding + 16f : 0f;
         float totalHeight = mealsHeight + ingredientsHeight + luxuryHeight + 20f;
 
         Rect outRect = new Rect(0f, y, inRect.width, inRect.height - y - 50f);
@@ -194,19 +200,22 @@ public class Dialog_DietInfo : Window
         contentY = DrawIconGrid(viewRect.width, contentY, ingredientLatestTick);
         contentY += 10f;
 
-        // Separator
-        GUI.color = new Color(1f, 1f, 1f, 0.2f);
-        Widgets.DrawLineHorizontal(0f, contentY, viewRect.width);
-        GUI.color = Color.white;
-        contentY += 6f;
+        if (luxuryOn)
+        {
+            // Separator
+            GUI.color = new Color(1f, 1f, 1f, 0.2f);
+            Widgets.DrawLineHorizontal(0f, contentY, viewRect.width);
+            GUI.color = Color.white;
+            contentY += 6f;
 
-        // === Luxury slots section ===
-        GUI.color = GreenText;
-        Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_LuxurySlots".Translate());
-        GUI.color = Color.white;
-        contentY += 28f;
+            // === Luxury slots section ===
+            GUI.color = GreenText;
+            Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_LuxurySlots".Translate());
+            GUI.color = Color.white;
+            contentY += 28f;
 
-        contentY = DrawLuxurySlots(viewRect.width, contentY, data);
+            contentY = DrawLuxurySlots(viewRect.width, contentY, data);
+        }
 
         Widgets.EndScrollView();
 

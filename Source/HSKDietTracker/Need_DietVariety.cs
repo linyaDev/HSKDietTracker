@@ -43,9 +43,9 @@ public class Need_DietVariety : Need
             {
                 case TechLevel.Animal:
                 case TechLevel.Neolithic: epochMax = 30; break;
-                case TechLevel.Medieval: epochMax = 40; break;
-                case TechLevel.Industrial: epochMax = 50; break;
-                default: epochMax = 60; break;
+                case TechLevel.Medieval: epochMax = 50; break;
+                case TechLevel.Industrial: epochMax = 70; break;
+                default: epochMax = 80; break;
             }
         }
 
@@ -115,7 +115,8 @@ public class Need_DietVariety : Need
         var data = comp.GetData(pawn);
         float maxScore = GetNeutralScore() + GetBiomeBonus();
         if (maxScore < 10f) maxScore = 10f;
-        float score = Mathf.Clamp(data.Score, 0f, maxScore) + data.LuxuryScore;
+        int luxuryScore = (HSKDietTrackerMod.Settings?.luxuryEnabled ?? true) ? data.LuxuryScore : 0;
+        float score = Mathf.Clamp(data.Score, 0f, maxScore) + luxuryScore;
         float realLevel = Mathf.Clamp01(score / maxScore);
 
         // Small colony: too few to be picky

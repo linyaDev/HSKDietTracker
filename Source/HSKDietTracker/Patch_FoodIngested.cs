@@ -24,14 +24,15 @@ public static class Patch_FoodIngested
         string mealDef = __instance.def.defName;
 
         // Check luxury: first by XML list, then by auto-detection
-        if (LuxurySlotLoader.AllLuxuryDefNames.Contains(mealDef))
+        bool luxuryEnabled = HSKDietTrackerMod.Settings?.luxuryEnabled ?? true;
+        if (luxuryEnabled && LuxurySlotLoader.AllLuxuryDefNames.Contains(mealDef))
         {
             comp.RecordLuxury(ingester, mealDef);
             return;
         }
 
         // Auto-detect alcohol/smoking by chemical properties
-        string detected = LuxurySlotLoader.DetectCategory(__instance.def);
+        string detected = luxuryEnabled ? LuxurySlotLoader.DetectCategory(__instance.def) : null;
         if (detected != null)
         {
             comp.RecordLuxury(ingester, mealDef, detected);

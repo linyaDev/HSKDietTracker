@@ -8,9 +8,12 @@ public class HSKDietTrackerSettings : ModSettings
 {
     // Epoch base max
     public int epochNeolithic = 30;
-    public int epochMedieval = 40;
-    public int epochIndustrial = 50;
-    public int epochSpacer = 60;
+    public int epochMedieval = 50;
+    public int epochIndustrial = 70;
+    public int epochSpacer = 80;
+
+    // Luxury
+    public bool luxuryEnabled = true;
 
     // Window position
     public float windowX = -1f;
@@ -19,9 +22,10 @@ public class HSKDietTrackerSettings : ModSettings
     public override void ExposeData()
     {
         Scribe_Values.Look(ref epochNeolithic, "epochNeolithic", 30);
-        Scribe_Values.Look(ref epochMedieval, "epochMedieval", 40);
-        Scribe_Values.Look(ref epochIndustrial, "epochIndustrial", 50);
-        Scribe_Values.Look(ref epochSpacer, "epochSpacer", 60);
+        Scribe_Values.Look(ref epochMedieval, "epochMedieval", 50);
+        Scribe_Values.Look(ref epochIndustrial, "epochIndustrial", 70);
+        Scribe_Values.Look(ref epochSpacer, "epochSpacer", 80);
+        Scribe_Values.Look(ref luxuryEnabled, "luxuryEnabled", true);
         Scribe_Values.Look(ref windowX, "windowX", -1f);
         Scribe_Values.Look(ref windowY, "windowY", -1f);
         base.ExposeData();
@@ -45,6 +49,10 @@ public class HSKDietTrackerMod : Mod
         var list = new Listing_Standard();
         list.ColumnWidth = inRect.width;
         list.Begin(inRect);
+
+        // === Luxury toggle ===
+        list.CheckboxLabeled("DT_SettingsLuxury".Translate(), ref Settings.luxuryEnabled, "DT_SettingsLuxuryTip".Translate());
+        list.Gap(8f);
 
         // === Epoch table ===
 #if V15
