@@ -24,7 +24,8 @@ public static class Patch_FoodIngested
         string mealDef = __instance.def.defName;
 
         // Check luxury: first by XML list, then by auto-detection
-        bool luxuryEnabled = HSKDietTrackerMod.Settings?.luxuryEnabled ?? true;
+        var techLevel = Faction.OfPlayer?.def?.techLevel ?? TechLevel.Neolithic;
+        bool luxuryEnabled = (HSKDietTrackerMod.Settings?.luxuryEnabled ?? true) && techLevel > TechLevel.Neolithic;
         if (luxuryEnabled && LuxurySlotLoader.AllLuxuryDefNames.Contains(mealDef))
         {
             comp.RecordLuxury(ingester, mealDef);

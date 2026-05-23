@@ -115,7 +115,9 @@ public class Need_DietVariety : Need
         var data = comp.GetData(pawn);
         float maxScore = GetNeutralScore() + GetBiomeBonus();
         if (maxScore < 10f) maxScore = 10f;
-        int luxuryScore = (HSKDietTrackerMod.Settings?.luxuryEnabled ?? true) ? data.LuxuryScore : 0;
+        var techLevel = Faction.OfPlayer?.def?.techLevel ?? TechLevel.Neolithic;
+        bool luxuryActive = (HSKDietTrackerMod.Settings?.luxuryEnabled ?? true) && techLevel > TechLevel.Neolithic;
+        int luxuryScore = luxuryActive ? data.LuxuryScore : 0;
         float score = Mathf.Clamp(data.Score, 0f, maxScore) + luxuryScore;
         float realLevel = Mathf.Clamp01(score / maxScore);
 

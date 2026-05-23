@@ -86,8 +86,12 @@ public class Dialog_DietInfo : Window
         Rect statsRect = new Rect(0f, y, inRect.width, 50f);
         Widgets.DrawBoxSolid(statsRect, new Color(0.15f, 0.15f, 0.15f, 0.8f));
 
-        bool luxuryOn = HSKDietTrackerMod.Settings?.luxuryEnabled ?? true;
-        float colW = inRect.width / (luxuryOn ? 4f : 3f);
+        bool luxurySettingOn = HSKDietTrackerMod.Settings?.luxuryEnabled ?? true;
+        var techLevel = Faction.OfPlayer?.def?.techLevel ?? TechLevel.Neolithic;
+        bool luxuryLocked = techLevel <= TechLevel.Neolithic;
+        bool luxuryOn = luxurySettingOn && !luxuryLocked;
+        bool luxuryVisible = luxurySettingOn; // show column even if locked
+        float colW = inRect.width / (luxuryVisible ? 4f : 3f);
         Text.Anchor = TextAnchor.MiddleCenter;
 
         GUI.color = GreenText;
@@ -102,14 +106,15 @@ public class Dialog_DietInfo : Window
         Text.Font = GameFont.Small;
 
         int scoreColIdx = 2;
-        if (luxuryOn)
+        if (luxuryVisible)
         {
-            int totalSlots = LuxurySlotLoader.TotalSlots;
-            int filledSlots = data.TotalFilledSlots;
-            GUI.color = filledSlots > 0 ? GreenText : DimText;
+            GUI.color = luxuryLocked ? DimText : (data.TotalFilledSlots > 0 ? GreenText : DimText);
             Widgets.Label(new Rect(colW * 2f, y + 2f, colW, 22f), "DT_Luxury".Translate());
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(colW * 2f, y + 22f, colW, 26f), filledSlots + " / " + totalSlots);
+            if (luxuryLocked)
+                Widgets.Label(new Rect(colW * 2f, y + 22f, colW, 26f), "—");
+            else
+                Widgets.Label(new Rect(colW * 2f, y + 22f, colW, 26f), data.TotalFilledSlots + " / " + LuxurySlotLoader.TotalSlots);
             Text.Font = GameFont.Small;
             scoreColIdx = 3;
         }
@@ -166,7 +171,7 @@ public class Dialog_DietInfo : Window
         float iconsPerRow = Mathf.Floor((inRect.width - 16f) / (IconSize + IconPadding));
         float mealsHeight = 30f + Mathf.Ceil(mealLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
         float ingredientsHeight = 30f + Mathf.Ceil(ingredientLatestTick.Count / iconsPerRow) * (IconSize + IconPadding) + 10f;
-        float luxuryHeight = luxuryOn ? 30f + LuxCellSize + LuxCellPadding + 16f : 0f;
+        float luxuryHeight = luxuryVisible ? 30f + LuxCellSize + LuxCellPadding + 16f + (luxuryLocked ? 24f : 0f) : 0f;
         float totalHeight = mealsHeight + ingredientsHeight + luxuryHeight + 20f;
 
         Rect outRect = new Rect(0f, y, inRect.width, inRect.height - y - 50f);
@@ -200,7 +205,7 @@ public class Dialog_DietInfo : Window
         contentY = DrawIconGrid(viewRect.width, contentY, ingredientLatestTick);
         contentY += 10f;
 
-        if (luxuryOn)
+        if (luxuryVisible)
         {
             // Separator
             GUI.color = new Color(1f, 1f, 1f, 0.2f);
@@ -209,10 +214,21 @@ public class Dialog_DietInfo : Window
             contentY += 6f;
 
             // === Luxury slots section ===
-            GUI.color = GreenText;
+            GUI.color = luxuryLocked ? DimText : GreenText;
             Widgets.Label(new Rect(0f, contentY, viewRect.width, 26f), "DT_LuxurySlots".Translate());
             GUI.color = Color.white;
             contentY += 28f;
+
+            if (luxuryLocked)
+            {
+                // Locked message
+                Text.Anchor = TextAnchor.MiddleCenter;
+                GUI.color = new Color(0.5f, 0.8f, 1f);
+                Widgets.Label(new Rect(0f, contentY, viewRect.width, 20f), "DT_LuxuryLocked".Translate());
+                GUI.color = Color.white;
+                Text.Anchor = TextAnchor.UpperLeft;
+                contentY += 24f;
+            }
 
             contentY = DrawLuxurySlots(viewRect.width, contentY, data);
         }
