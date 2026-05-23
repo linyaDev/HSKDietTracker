@@ -230,7 +230,7 @@ public class Dialog_DietInfo : Window
                 contentY += 24f;
             }
 
-            contentY = DrawLuxurySlots(viewRect.width, contentY, data);
+            contentY = DrawLuxurySlots(viewRect.width, contentY, data, luxuryLocked);
         }
 
         Widgets.EndScrollView();
@@ -383,7 +383,9 @@ public class Dialog_DietInfo : Window
 
     private static readonly Color LuxuryTimerColor = new Color(0.3f, 0.85f, 0.3f, 0.35f);
 
-    private float DrawLuxurySlots(float width, float startY, PawnDietData data)
+    private static readonly Color LockedCrossColor = new Color(0.9f, 0.3f, 0.3f, 0.6f);
+
+    private float DrawLuxurySlots(float width, float startY, PawnDietData data, bool locked = false)
     {
         float x = 0f;
         float y = startY;
@@ -391,7 +393,7 @@ public class Dialog_DietInfo : Window
 
         foreach (var cat in LuxurySlotLoader.Categories)
         {
-            var filledItemTicks = data.FilledLuxuryItemsWithTicks(cat.name);
+            var filledItemTicks = locked ? new Dictionary<string, int>() : data.FilledLuxuryItemsWithTicks(cat.name);
             var filledItems = filledItemTicks.Keys.ToList();
             string catLabel = cat.labelKey.Translate();
 
@@ -404,7 +406,7 @@ public class Dialog_DietInfo : Window
                 }
 
                 Rect cellRect = new Rect(x, y, LuxCellSize, LuxCellSize);
-                bool isFilled = slot < filledItems.Count;
+                bool isFilled = !locked && slot < filledItems.Count;
 
                 // Background
                 Widgets.DrawBoxSolid(cellRect, LuxuryEmptyBg);
@@ -420,9 +422,21 @@ public class Dialog_DietInfo : Window
                 }
 
                 // Border
-                GUI.color = isFilled ? GreenText : new Color(1f, 1f, 1f, 0.15f);
+                GUI.color = locked ? new Color(1f, 1f, 1f, 0.1f) : (isFilled ? GreenText : new Color(1f, 1f, 1f, 0.15f));
                 Widgets.DrawBox(cellRect, 1);
                 GUI.color = Color.white;
+
+                // Locked cross
+                if (locked)
+                {
+                    GUI.color = LockedCrossColor;
+                    Text.Font = GameFont.Medium;
+                    Text.Anchor = TextAnchor.MiddleCenter;
+                    Widgets.Label(cellRect, "\u2716");
+                    Text.Font = GameFont.Small;
+                    Text.Anchor = TextAnchor.UpperLeft;
+                    GUI.color = Color.white;
+                }
 
                 // Icon area (upper center)
                 Rect iconArea = new Rect(x + (LuxCellSize - LuxIconArea) / 2f, y + 4f, LuxIconArea, LuxIconArea);
