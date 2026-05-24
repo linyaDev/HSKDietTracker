@@ -24,11 +24,11 @@ public static class Patch_FoodOptimality
         else
             __result += 15f;
 
-        // Prefer food about to spoil
+        // Prefer food about to spoil (but only if still fresh)
         if (foodSource != null)
         {
             var rottable = foodSource.TryGetComp<CompRottable>();
-            if (rottable != null)
+            if (rottable != null && rottable.Stage == RotStage.Fresh)
             {
                 float rotProgress = rottable.RotProgress / rottable.PropsRot.TicksToRotStart;
                 if (rotProgress > 0.5f)
