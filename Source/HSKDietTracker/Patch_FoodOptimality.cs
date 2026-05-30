@@ -16,6 +16,22 @@ public static class Patch_FoodOptimality
         if (comp == null)
             return;
 
+        // Skip rotten food entirely
+        if (foodSource != null)
+        {
+            var rottable = foodSource.TryGetComp<CompRottable>();
+            if (rottable != null && rottable.Stage != RotStage.Fresh)
+                return;
+
+            // Prefer food about to spoil (max +12, so new food +15 still wins)
+            if (rottable != null)
+            {
+                int ticksLeft = rottable.TicksUntilRotAtCurrentTemp;
+                if (ticksLeft < 180000) // last 3 days
+                    __result += 12f * (1f - (float)ticksLeft / 180000f);
+            }
+        }
+
         var data = comp.GetData(eater);
 
         // Prefer food not eaten recently
@@ -23,17 +39,5 @@ public static class Patch_FoodOptimality
             __result -= 30f;
         else
             __result += 15f;
-
-        // Prefer food about to spoil (but only if still fresh)
-        if (foodSource != null)
-        {
-            var rottable = foodSource.TryGetComp<CompRottable>();
-            if (rottable != null && rottable.Stage == RotStage.Fresh)
-            {
-                float rotProgress = rottable.RotProgress / rottable.PropsRot.TicksToRotStart;
-                if (rotProgress > 0.5f)
-                    __result += 20f * rotProgress;
-            }
-        }
     }
 }
