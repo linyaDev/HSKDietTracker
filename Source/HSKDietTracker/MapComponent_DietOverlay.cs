@@ -30,6 +30,29 @@ public class MapComponent_DietOverlay : MapComponent
     private static Texture2D texAll;
     private static Texture2D texSome;
 
+    // === Food item icons on the ground ===
+    // Translucent backing disc colors (icon drawn on top in its natural color).
+    private static readonly Color BackRingSome = new Color(0.3f, 0.8f, 0.35f, 0.9f);
+    private static readonly Color BackFillSome = new Color(0.12f, 0.3f, 0.14f, 0.55f);
+    private static readonly Color BackRingAll = new Color(0.9f, 0.65f, 0.2f, 0.95f);
+    private static readonly Color BackFillAll = new Color(0.3f, 0.2f, 0.06f, 0.6f);
+
+    private static Material backMatSome;
+    private static Material backMatAll;
+    private static Texture2D backTexSome;
+    private static Texture2D backTexAll;
+
+    private struct ItemMarker
+    {
+        public Thing thing;
+        public Material backMat;
+        public Material iconMat;
+        public string tip;
+        public float dx;
+    }
+
+    private readonly List<ItemMarker> itemMarkers = new List<ItemMarker>();
+
     public MapComponent_DietOverlay(Map map) : base(map)
     {
     }
@@ -103,6 +126,51 @@ public class MapComponent_DietOverlay : MapComponent
         return cached;
     }
 
+    private static Texture2D MakeDiscTexture(Color ringColor, Color fillColor)
+    {
+        int size = 64;
+        var tex = new Texture2D(size, size, TextureFormat.ARGB32, false);
+        float center = size / 2f;
+        float outerR = 30f;
+        float innerR = 28f; // thinner ring
+
+        var pixels = new Color[size * size];
+        for (int i = 0; i < pixels.Length; i++)
+            pixels[i] = Color.clear;
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dist = Mathf.Sqrt((x - center) * (x - center) + (y - center) * (y - center));
+                if (dist <= outerR && dist > innerR)
+                    pixels[y * size + x] = ringColor;
+                else if (dist <= innerR)
+                    pixels[y * size + x] = fillColor;
+            }
+        }
+
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return tex;
+    }
+
+    private static Material GetBackMat(ref Material cached, ref Texture2D cachedTex, Color ring, Color fill)
+    {
+        if (cached == null)
+        {
+            if (cachedTex == null)
+                cachedTex = MakeDiscTexture(ring, fill);
+            cached = MaterialPool.MatFrom(new MaterialRequest
+            {
+                mainTex = cachedTex,
+                color = Color.white,
+                shader = ShaderDatabase.MetaOverlay
+            });
+        }
+        return cached;
+    }
+
     public override void MapComponentUpdate()
     {
         if (!Enabled)
@@ -138,6 +206,37 @@ public class MapComponent_DietOverlay : MapComponent
             matrix.SetTRS(pos, Quaternion.identity, new Vector3(markerSize, 1f, markerSize));
             Graphics.DrawMesh(MeshPool.plane10, matrix, mat, 0);
         }
+
+        DrawItemMarkers();
+    }
+
+    private void DrawItemMarkers()
+    {
+        for (int i = 0; i < itemMarkers.Count; i++)
+        {
+            var m = itemMarkers[i];
+            if (m.thing == null || m.thing.Destroyed || !m.thing.Spawned || m.thing.Map != map)
+                continue;
+
+            Vector3 pos = m.thing.DrawPos;
+            pos.y = AltitudeLayer.MetaOverlays.AltitudeFor();
+            pos.z += 0.55f;
+            pos.x += m.dx;
+
+            // Backing disc (green/amber) so the natural-colored icon stays readable.
+            float backSize = 0.55f;
+            Matrix4x4 mb = default;
+            mb.SetTRS(pos, Quaternion.identity, new Vector3(backSize, 1f, backSize));
+            Graphics.DrawMesh(MeshPool.plane10, mb, m.backMat, 0);
+
+            // Icon on top, slightly higher altitude.
+            Vector3 ip = pos;
+            ip.y += 0.01f;
+            float iconSize = 0.4f;
+            Matrix4x4 mi = default;
+            mi.SetTRS(ip, Quaternion.identity, new Vector3(iconSize, 1f, iconSize));
+            Graphics.DrawMesh(MeshPool.plane10, mi, m.iconMat, 0);
+        }
     }
 
     private Pawn FindAnimalById(int id)
@@ -154,6 +253,7 @@ public class MapComponent_DietOverlay : MapComponent
     private void RebuildCache()
     {
         animalHighlight.Clear();
+        itemMarkers.Clear();
 
         var comp = Current.Game?.GetComponent<GameComponent_DietTracker>();
         if (comp == null)
@@ -223,6 +323,187 @@ public class MapComponent_DietOverlay : MapComponent
 
             byte level = needCount == colonists.Count ? (byte)2 : (byte)1;
             animalHighlight[animal.thingIDNumber] = level;
+        }
+
+        RebuildItemMarkers(colonists, colonistEaten);
+    }
+
+    private sealed class MarkerCandidate
+    {
+        public Thing thing;
+        public int stack;
+        public Texture2D tex;
+        public Color color;
+        public string label;
+        public int needCount;
+    }
+
+    private void RebuildItemMarkers(List<Pawn> colonists, List<HashSet<string>> colonistEaten)
+    {
+        // One marker per *ingredient* colonists are missing. For meat the ingredients are the
+        // source animals recorded on the stack (HSK lumps many animals into one meat tier, but
+        // each stack's CompIngredients lists what it's actually made of). For everything else
+        // the item itself is the ingredient.
+        var byIngredient = new Dictionary<string, MarkerCandidate>();
+        int scanned = 0, meatStacks = 0, meatNoComp = 0, meatSrc = 0, vegSeen = 0;
+
+        foreach (var thing in map.listerThings.ThingsInGroup(ThingRequestGroup.FoodSourceNotPlantOrTree))
+        {
+            var def = thing.def;
+            if (def?.ingestible == null || def.IsCorpse || def.IsDrug)
+                continue;
+            // Skip animal-only feed (hay, etc.) and kibble.
+            if (!def.ingestible.HumanEdible)
+                continue;
+            if ((def.ingestible.foodType & FoodTypeFlags.Kibble) != 0)
+                continue;
+            // Raw ingredients only: exclude cooked meals (>= MealAwful) and non-food.
+            var pref = def.ingestible.preferability;
+            if (pref <= FoodPreferability.NeverForNutrition || pref > FoodPreferability.RawTasty)
+                continue;
+            // Luxuries are tracked separately.
+            if (LuxurySlotLoader.AllLuxuryDefNames.Contains(def.defName))
+                continue;
+
+            scanned++;
+
+            if (def.IsMeat)
+            {
+                meatStacks++;
+                var ci = thing.TryGetComp<CompIngredients>();
+                if (ci?.ingredients == null)
+                {
+                    meatNoComp++;
+                    continue;
+                }
+                foreach (var src in ci.ingredients)
+                {
+                    if (src == null)
+                        continue;
+
+                    Texture2D tex;
+                    Color col;
+                    string label;
+                    if (FoodIcon.TryGetCreature(src, out tex, out col))
+                    {
+                        // Specific animal (fox, muffalo, fish…).
+                        label = src.LabelCap;
+                    }
+                    else
+                    {
+                        // No creature icon (e.g. humanlike flesh) → draw the meat item's own texture.
+                        tex = thing.def.uiIcon;
+                        col = thing.def.uiIconColor;
+                        label = thing.def.LabelCap;
+                        if (tex == null || tex == BaseContent.BadTex)
+                            continue;
+                    }
+
+                    meatSrc++;
+                    Consider(byIngredient, colonistEaten, thing, src.defName, tex, col, label);
+                }
+            }
+            else
+            {
+                vegSeen++;
+                if (!FoodIcon.TryGet(def, out var tex, out var col))
+                    continue;
+                Consider(byIngredient, colonistEaten, thing, def.defName, tex, col, def.LabelCap);
+            }
+        }
+
+        if (Prefs.DevMode)
+            Log.Message("[HSKDietTracker] overlay rebuild: colonists=" + colonists.Count
+                + " scanned=" + scanned + " meatStacks=" + meatStacks + " meatNoComp=" + meatNoComp
+                + " meatSrc=" + meatSrc + " vegSeen=" + vegSeen
+                + " candidates=" + byIngredient.Count
+                + " [" + string.Join(", ", new List<string>(byIngredient.Keys)) + "]");
+
+        // Group icons that land on the same stack so we can fan them out instead of overlapping.
+        var perThing = new Dictionary<Thing, List<MarkerCandidate>>();
+        foreach (var c in byIngredient.Values)
+        {
+            if (!perThing.TryGetValue(c.thing, out var list))
+            {
+                list = new List<MarkerCandidate>();
+                perThing[c.thing] = list;
+            }
+            list.Add(c);
+        }
+
+        foreach (var list in perThing.Values)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                var c = list[i];
+                bool all = c.needCount == colonists.Count;
+                Material backMat = all
+                    ? GetBackMat(ref backMatAll, ref backTexAll, BackRingAll, BackFillAll)
+                    : GetBackMat(ref backMatSome, ref backTexSome, BackRingSome, BackFillSome);
+                var iconMat = MaterialPool.MatFrom(new MaterialRequest
+                {
+                    mainTex = c.tex,
+                    color = c.color,
+                    shader = ShaderDatabase.MetaOverlay
+                });
+
+                float dx = (i - (list.Count - 1) / 2f) * 0.5f;
+                itemMarkers.Add(new ItemMarker { thing = c.thing, backMat = backMat, iconMat = iconMat, tip = c.label, dx = dx });
+            }
+        }
+    }
+
+    private static void Consider(Dictionary<string, MarkerCandidate> byIngredient, List<HashSet<string>> eaten,
+        Thing thing, string key, Texture2D tex, Color color, string label)
+    {
+        if (IgnoredLoader.Ignored.Contains(key))
+            return;
+
+        int needCount = 0;
+        for (int i = 0; i < eaten.Count; i++)
+        {
+            if (!eaten[i].Contains(key))
+                needCount++;
+        }
+        if (needCount == 0)
+            return; // every colonist has eaten it — not interesting
+
+        // Keep the largest stack as the representative for this ingredient.
+        if (byIngredient.TryGetValue(key, out var cur) && cur.stack >= thing.stackCount)
+            return;
+
+        byIngredient[key] = new MarkerCandidate
+        {
+            thing = thing,
+            stack = thing.stackCount,
+            tex = tex,
+            color = color,
+            label = label,
+            needCount = needCount
+        };
+    }
+
+    public override void MapComponentOnGUI()
+    {
+        if (!Enabled || itemMarkers.Count == 0)
+            return;
+        if (Find.CurrentMap != map)
+            return;
+
+        for (int i = 0; i < itemMarkers.Count; i++)
+        {
+            var m = itemMarkers[i];
+            if (m.thing == null || m.thing.Destroyed || !m.thing.Spawned || m.thing.Map != map || string.IsNullOrEmpty(m.tip))
+                continue;
+
+            Vector3 wp = m.thing.DrawPos;
+            wp.z += 0.55f;
+            wp.x += m.dx;
+            Vector2 screen = wp.MapToUIPosition();
+            float s = 26f;
+            Rect r = new Rect(screen.x - s / 2f, screen.y - s / 2f, s, s);
+            if (Mouse.IsOver(r))
+                TooltipHandler.TipRegion(r, new TipSignal(m.tip, m.thing.thingIDNumber ^ 0x5D1E7));
         }
     }
 }

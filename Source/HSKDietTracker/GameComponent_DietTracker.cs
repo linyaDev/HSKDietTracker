@@ -94,6 +94,31 @@ public class PawnDietData : IExposable
 
     public int Score => UniqueMeals * MealWeight + UniqueIngredients * IngredientWeight;
 
+    /// <summary>
+    /// All distinct ingredient/raw-food defNames eaten within the last 7 days.
+    /// (Meals contribute their ingredients; raw foods contribute themselves.)
+    /// </summary>
+    public HashSet<string> RecentEatenSet
+    {
+        get
+        {
+            var all = new HashSet<string>();
+            foreach (var r in ValidRecords)
+            {
+                if (r.isMeal)
+                {
+                    foreach (var ing in r.ingredients)
+                        all.Add(ing);
+                }
+                else
+                {
+                    all.Add(r.mealDef);
+                }
+            }
+            return all;
+        }
+    }
+
     public int LuxuryScore
     {
         get

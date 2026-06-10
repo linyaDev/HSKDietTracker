@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Diet Tracker: ingredient defNames to IGNORE in the map food overlay.
+    Use for seasonings/additives that show up inside meat/meal ingredients but
+    aren't a meaningful "variety" ingredient to highlight (e.g. Salt).
+    One <Item> per defName.
+-->
+<IgnoredDefs>
+    <Item>Salt</Item>
+</IgnoredDefs>
