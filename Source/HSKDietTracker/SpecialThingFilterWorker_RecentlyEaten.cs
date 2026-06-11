@@ -43,8 +43,10 @@ internal static class DietFilterState
             colonistEaten.Add(comp.GetData(p).RecentEatenSet);
         }
 
-        // Tally how much of each ingredient is available to cooks on the map.
-        var availableCount = new Dictionary<string, int>();
+        // Tally how much of each ingredient is available to cooks on the map, keeping meat and
+        // vegetables apart so each category gets its own variety slots.
+        var meatCount = new Dictionary<string, int>();
+        var vegCount = new Dictionary<string, int>();
         var maps = Find.Maps;
         for (int i = 0; i < maps.Count; i++)
         {
@@ -55,25 +57,32 @@ internal static class DietFilterState
             {
                 if (!IsRawIngredient(thing.def))
                     continue;
+                var counts = thing.def.IsMeat ? meatCount : vegCount;
                 foreach (var key in IngredientKeys(thing))
                 {
-                    availableCount.TryGetValue(key, out int c);
-                    availableCount[key] = c + thing.stackCount;
+                    counts.TryGetValue(key, out int c);
+                    counts[key] = c + thing.stackCount;
                 }
             }
         }
 
-        // Only ingredients with enough stock to actually cook a meal are worth a variety slot.
-        var available = availableCount
-            .Where(kv => kv.Value >= MinCookableCount)
-            .Select(kv => kv.Key);
+        // Top-N per category (meat, vegetables): the ingredients eaten by the fewest colonists,
+        // limited to those with enough stock to actually cook with (ties broken by name).
+        AddTopN(meatCount, top3);
+        AddTopN(vegCount, top3);
+    }
 
-        // The 3 available ingredients eaten by the fewest colonists (ties broken by name).
-        top3 = available
+    private static void AddTopN(Dictionary<string, int> counts, HashSet<string> dest)
+    {
+        foreach (var key in counts
+            .Where(kv => kv.Value >= MinCookableCount)
+            .Select(kv => kv.Key)
             .OrderBy(EatenByCount)
             .ThenBy(k => k)
-            .Take(TopN)
-            .ToHashSet();
+            .Take(TopN))
+        {
+            dest.Add(key);
+        }
     }
 
     private static int EatenByCount(string key)
