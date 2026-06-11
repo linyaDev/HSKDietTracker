@@ -7,4 +7,6 @@
 -->
 <IgnoredDefs>
     <Item>Salt</Item>
+    <Item>RottedMeat</Item>
+    <Item>RottedMush</Item>
 </IgnoredDefs>

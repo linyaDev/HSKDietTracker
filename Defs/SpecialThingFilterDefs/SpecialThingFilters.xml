@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <SpecialThingFilterDef>
+    <defName>HSKDT_AllowRecentlyEaten</defName>
+    <label>allow monotonous food</label>
+    <description>Allow every ingredient except the 3 the colony most needs for variety. Uncheck to cook only from the 3 ingredients (available on the map) that the fewest colonists have eaten in the last 7 days. For meat this is judged by the source animals recorded on each stack.</description>
+    <parentCategory>Foods</parentCategory>
+    <allowedByDefault>true</allowedByDefault>
+    <saveKey>HSKDT_allowRecentlyEaten</saveKey>
+    <workerClass>HSKDietTracker.SpecialThingFilterWorker_RecentlyEaten</workerClass>
+  </SpecialThingFilterDef>
+
+</Defs>

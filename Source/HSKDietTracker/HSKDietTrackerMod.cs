@@ -19,6 +19,10 @@ public class HSKDietTrackerSettings : ModSettings
     public float windowX = -1f;
     public float windowY = -1f;
 
+    // Diagnostic: ingredients currently drawn with the yellow (top-3 variety) ring.
+    // Updated by the map overlay whenever it rebuilds its markers; shown in the settings window.
+    public string lastYellowIngredients = "";
+
     public override void ExposeData()
     {
         Scribe_Values.Look(ref epochNeolithic, "epochNeolithic", 30);
@@ -140,6 +144,28 @@ public class HSKDietTrackerMod : Mod
             Widgets.Label(new Rect(10f, y, inRect.width - 20f, 20f), kvp.Key + ": " + sign + kvp.Value);
             y += 22f;
         }
+        GUI.color = Color.white;
+
+        // === Diagnostic: yellow (top-3 variety) ingredients ===
+        GUI.color = new Color(1f, 1f, 1f, 0.4f);
+        Widgets.DrawLineHorizontal(0f, y, inRect.width);
+        GUI.color = Color.white;
+        y += 6f;
+
+        GUI.color = new Color(1f, 0.95f, 0.1f, 1f);
+        Widgets.Label(new Rect(0f, y, inRect.width, 24f), "Yellow-ringed ingredients (drawn on map):");
+        GUI.color = Color.white;
+        y += 26f;
+
+        GUI.color = new Color(1f, 1f, 1f, 0.6f);
+        string yellow = string.IsNullOrEmpty(Settings.lastYellowIngredients) ? "(none)" : Settings.lastYellowIngredients;
+        Widgets.Label(new Rect(10f, y, inRect.width - 20f, 44f), yellow);
+        y += 46f;
+
+        Widgets.Label(new Rect(0f, y, inRect.width, 24f), "Computed top-3 variety ingredients:");
+        y += 26f;
+        Widgets.Label(new Rect(10f, y, inRect.width - 20f, 44f), DietFilterState.DebugTop3Summary());
+        y += 46f;
         GUI.color = Color.white;
 
         list.End();

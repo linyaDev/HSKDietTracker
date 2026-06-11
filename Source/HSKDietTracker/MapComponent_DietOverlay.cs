@@ -42,6 +42,13 @@ public class MapComponent_DietOverlay : MapComponent
     private static Texture2D backTexSome;
     private static Texture2D backTexAll;
 
+    // Top-3 "best for variety" ingredients get a distinct (bright yellow) ring, fill still encodes need.
+    private static readonly Color BackRingTop3 = new Color(1f, 0.95f, 0.1f, 1f);
+    private static Material backMatTop3Some;
+    private static Material backMatTop3All;
+    private static Texture2D backTexTop3Some;
+    private static Texture2D backTexTop3All;
+
     private struct ItemMarker
     {
         public Thing thing;
@@ -336,6 +343,7 @@ public class MapComponent_DietOverlay : MapComponent
         public Color color;
         public string label;
         public int needCount;
+        public bool isTop3;
     }
 
     private void RebuildItemMarkers(List<Pawn> colonists, List<HashSet<string>> colonistEaten)
@@ -412,6 +420,18 @@ public class MapComponent_DietOverlay : MapComponent
             }
         }
 
+        // Record which ingredients actually get the yellow (top-3) ring, for the settings window.
+        var yellow = new List<string>();
+        foreach (var c in byIngredient.Values)
+        {
+            if (c.isTop3)
+                yellow.Add(c.label);
+        }
+        yellow.Sort();
+        if (HSKDietTrackerMod.Settings != null)
+            HSKDietTrackerMod.Settings.lastYellowIngredients =
+                yellow.Count > 0 ? string.Join(", ", yellow) : "(none)";
+
         if (Prefs.DevMode)
             Log.Message("[HSKDietTracker] overlay rebuild: colonists=" + colonists.Count
                 + " scanned=" + scanned + " meatStacks=" + meatStacks + " meatNoComp=" + meatNoComp
@@ -437,9 +457,15 @@ public class MapComponent_DietOverlay : MapComponent
             {
                 var c = list[i];
                 bool all = c.needCount == colonists.Count;
-                Material backMat = all
-                    ? GetBackMat(ref backMatAll, ref backTexAll, BackRingAll, BackFillAll)
-                    : GetBackMat(ref backMatSome, ref backTexSome, BackRingSome, BackFillSome);
+                Material backMat;
+                if (c.isTop3)
+                    backMat = all
+                        ? GetBackMat(ref backMatTop3All, ref backTexTop3All, BackRingTop3, BackFillAll)
+                        : GetBackMat(ref backMatTop3Some, ref backTexTop3Some, BackRingTop3, BackFillSome);
+                else
+                    backMat = all
+                        ? GetBackMat(ref backMatAll, ref backTexAll, BackRingAll, BackFillAll)
+                        : GetBackMat(ref backMatSome, ref backTexSome, BackRingSome, BackFillSome);
                 var iconMat = MaterialPool.MatFrom(new MaterialRequest
                 {
                     mainTex = c.tex,
@@ -479,7 +505,8 @@ public class MapComponent_DietOverlay : MapComponent
             tex = tex,
             color = color,
             label = label,
-            needCount = needCount
+            needCount = needCount,
+            isTop3 = DietFilterState.IsTop3Key(key)
         };
     }
 

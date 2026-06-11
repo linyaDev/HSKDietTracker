@@ -94,10 +94,7 @@ public class PawnDietData : IExposable
 
     public int Score => UniqueMeals * MealWeight + UniqueIngredients * IngredientWeight;
 
-    /// <summary>
-    /// All distinct ingredient/raw-food defNames eaten within the last 7 days.
-    /// (Meals contribute their ingredients; raw foods contribute themselves.)
-    /// </summary>
+    /// <summary>All distinct ingredient/raw-food defNames eaten within the last 7 days.</summary>
     public HashSet<string> RecentEatenSet
     {
         get
