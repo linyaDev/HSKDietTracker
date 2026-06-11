@@ -18,6 +18,9 @@ internal static class DietFilterState
     private static int lastTick = -999999;
     private const int Interval = 200; // ~5 in-game minutes
     private const int TopN = 3;
+    // Below this total stock an ingredient can't realistically be cooked into a meal,
+    // so it shouldn't waste one of the variety slots.
+    private const int MinCookableCount = 10;
 
     private static void Ensure()
     {
@@ -40,8 +43,8 @@ internal static class DietFilterState
             colonistEaten.Add(comp.GetData(p).RecentEatenSet);
         }
 
-        // Collect ingredient keys available to cooks on the map.
-        var available = new HashSet<string>();
+        // Tally how much of each ingredient is available to cooks on the map.
+        var availableCount = new Dictionary<string, int>();
         var maps = Find.Maps;
         for (int i = 0; i < maps.Count; i++)
         {
@@ -53,9 +56,17 @@ internal static class DietFilterState
                 if (!IsRawIngredient(thing.def))
                     continue;
                 foreach (var key in IngredientKeys(thing))
-                    available.Add(key);
+                {
+                    availableCount.TryGetValue(key, out int c);
+                    availableCount[key] = c + thing.stackCount;
+                }
             }
         }
+
+        // Only ingredients with enough stock to actually cook a meal are worth a variety slot.
+        var available = availableCount
+            .Where(kv => kv.Value >= MinCookableCount)
+            .Select(kv => kv.Key);
 
         // The 3 available ingredients eaten by the fewest colonists (ties broken by name).
         top3 = available
