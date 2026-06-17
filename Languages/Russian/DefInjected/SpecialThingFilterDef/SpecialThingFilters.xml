@@ -2,6 +2,6 @@
 <LanguageData>
 
   <HSKDT_AllowRecentlyEaten.label>разрешить однообразную еду</HSKDT_AllowRecentlyEaten.label>
-  <HSKDT_AllowRecentlyEaten.description>Разрешить все ингредиенты, кроме 3 самых нужных колонии для разнообразия. Снимите галочку, чтобы готовить только из 3 ингредиентов (из лежащих на карте), которые ело меньше всего колонистов за последние 7 дней. Для мяса учитываются животные-источники, записанные в каждой стопке.</HSKDT_AllowRecentlyEaten.description>
+  <HSKDT_AllowRecentlyEaten.description>При запрете повар будет готовить только из новых ингредиентов, которые колонисты ещё не ели (top-3 для разнообразия). Это помогает разнообразить рацион колонии.</HSKDT_AllowRecentlyEaten.description>
 
 </LanguageData>
