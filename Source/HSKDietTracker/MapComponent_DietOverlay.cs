@@ -8,6 +8,7 @@ namespace HSKDietTracker;
 public class MapComponent_DietOverlay : MapComponent
 {
     public static bool Enabled = true;
+    private bool savedEnabled = true;
 
     // All colonists need — gold ring, darker fill, amber "!"
     private static readonly Color RingAll = new Color(0.85f, 0.7f, 0.25f);
@@ -62,6 +63,16 @@ public class MapComponent_DietOverlay : MapComponent
 
     public MapComponent_DietOverlay(Map map) : base(map)
     {
+    }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        if (Scribe.mode == LoadSaveMode.Saving)
+            savedEnabled = Enabled;
+        Scribe_Values.Look(ref savedEnabled, "overlayEnabled", true);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            Enabled = savedEnabled;
     }
 
     private static Texture2D MakeMarkerTexture(Color ringColor, Color fillColor, Color exclaimColor)

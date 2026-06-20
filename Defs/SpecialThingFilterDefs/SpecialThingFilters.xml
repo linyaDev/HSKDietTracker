@@ -4,7 +4,7 @@
   <SpecialThingFilterDef>
     <defName>HSKDT_AllowRecentlyEaten</defName>
     <label>allow monotonous food</label>
-    <description>When disabled, the cook will only use ingredients that colonists haven't eaten recently (top-3 for variety). This helps diversify the colony's diet.</description>
+    <description>When disabled, the cook will only use ingredients that colonists haven't eaten recently. This helps diversify the colony's diet.</description>
     <parentCategory>Foods</parentCategory>
     <allowedByDefault>true</allowedByDefault>
     <saveKey>HSKDT_allowRecentlyEaten</saveKey>
