@@ -44,7 +44,7 @@ public class PawnDietData : IExposable
     public List<LuxuryRecord> luxuryRecords = new List<LuxuryRecord>();
     public int firstSeenTick = -1;
 
-    public const int MealWeight = 1;
+    public const int MealWeight = 2;
     public const int IngredientWeight = 3;
     private const int SevenDaysTicks = 420000;
     public const int GracePeriodTicks = 180000; // 3 days

@@ -8,7 +8,7 @@
 	<DT_TipStatsShort>Уникальных блюд: {0}  |  Уникальных ингредиентов: {1}</DT_TipStatsShort>
 	<DT_Today>сегодня</DT_Today>
 	<DT_DaysAgo>{0} дн. назад</DT_DaysAgo>
-	<DT_RecentMeals>Блюда: {0} (+1 оч.)</DT_RecentMeals>
+	<DT_RecentMeals>Блюда: {0} (+2 оч.)</DT_RecentMeals>
 	<DT_RecentIngredients>Ингредиенты: {0} (+3 оч.)</DT_RecentIngredients>
 	<DT_LastEaten>Последние приёмы пищи:</DT_LastEaten>
 	<DT_ExpiresIn>Истекает через {0}</DT_ExpiresIn>

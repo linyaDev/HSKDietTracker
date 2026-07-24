@@ -143,9 +143,10 @@ public class Dialog_DietInfo : Window
         y = DrawDietProgressBar(inRect, y, totalScore, neutral, maxScore, inGrace, elapsed, smallColony);
 
         // Collect unique meals (only cooked) and ingredients with latest tick
+        int cutoff = Find.TickManager.TicksGame - SevenDaysTicks + 2500;
         var mealLatestTick = new Dictionary<string, int>();
         var ingredientLatestTick = new Dictionary<string, int>();
-        foreach (var r in data.records)
+        foreach (var r in data.records.Where(r => r.tick >= cutoff))
         {
             if (r.isMeal)
             {
@@ -235,6 +236,11 @@ public class Dialog_DietInfo : Window
 
         Widgets.EndScrollView();
 
+        // Safety reset
+        Text.WordWrap = true;
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.UpperLeft;
+        GUI.color = Color.white;
     }
 
 
