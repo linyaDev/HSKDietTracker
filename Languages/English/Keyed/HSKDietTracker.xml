@@ -46,6 +46,8 @@
 	<DT_LuxuryItems>Items:</DT_LuxuryItems>
 	<DT_SettingsLuxury>Luxury slots (alcohol, drinks, sweets, smoking)</DT_SettingsLuxury>
 	<DT_SettingsLuxuryTip>Enable bonus points for consuming luxury items. Each filled slot gives +5 points on top of max score.</DT_SettingsLuxuryTip>
+	<DT_SettingsNoStack>Don't stack meals with different ingredients</DT_SettingsNoStack>
+	<DT_SettingsNoStackTip>Meals with different ingredients won't stack together. This preserves ingredient data and makes variety tracking more accurate.</DT_SettingsNoStackTip>
 	<DT_LuxuryLocked>Locked: tech level too low</DT_LuxuryLocked>
 	<DT_LuxAlcohol>Alcohol</DT_LuxAlcohol>
 	<DT_LuxDrinks>Drinks</DT_LuxDrinks>

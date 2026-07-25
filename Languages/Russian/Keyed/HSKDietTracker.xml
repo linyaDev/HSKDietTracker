@@ -46,6 +46,8 @@
 	<DT_LuxuryItems>Подходят:</DT_LuxuryItems>
 	<DT_SettingsLuxury>Удовольствия (спиртное, напитки, сладости, курение)</DT_SettingsLuxury>
 	<DT_SettingsLuxuryTip>Включить бонусные очки за употребление предметов удовольствия. Каждый заполненный слот даёт +5 очков поверх максимума.</DT_SettingsLuxuryTip>
+	<DT_SettingsNoStack>Не стаковать блюда с разными ингредиентами</DT_SettingsNoStack>
+	<DT_SettingsNoStackTip>Блюда с разными ингредиентами не будут складываться в один стак. Это сохраняет информацию об ингредиентах и делает подсчёт разнообразия точнее.</DT_SettingsNoStackTip>
 	<DT_LuxuryLocked>Заблокировано: уровень технологий</DT_LuxuryLocked>
 	<DT_LuxAlcohol>Спиртное</DT_LuxAlcohol>
 	<DT_LuxDrinks>Напитки</DT_LuxDrinks>
