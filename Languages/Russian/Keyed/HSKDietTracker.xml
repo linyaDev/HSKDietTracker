@@ -48,6 +48,8 @@
 	<DT_SettingsLuxuryTip>Включить бонусные очки за употребление предметов удовольствия. Каждый заполненный слот даёт +5 очков поверх максимума.</DT_SettingsLuxuryTip>
 	<DT_SettingsNoStack>Не стаковать блюда с разными ингредиентами</DT_SettingsNoStack>
 	<DT_SettingsNoStackTip>Блюда с разными ингредиентами не будут складываться в один стак. Это сохраняет информацию об ингредиентах и делает подсчёт разнообразия точнее.</DT_SettingsNoStackTip>
+	<DT_SettingsVarietyFallback>Готовить однообразную еду, если разнообразная закончилась</DT_SettingsVarietyFallback>
+	<DT_SettingsVarietyFallbackTip>Влияет на фильтр «однообразная еда» в рецептах. Когда разнообразные ингредиенты заканчиваются, повар начнёт готовить из однообразных вместо того, чтобы простаивать.</DT_SettingsVarietyFallbackTip>
 	<DT_LuxuryLocked>Заблокировано: уровень технологий</DT_LuxuryLocked>
 	<DT_LuxAlcohol>Спиртное</DT_LuxAlcohol>
 	<DT_LuxDrinks>Напитки</DT_LuxDrinks>

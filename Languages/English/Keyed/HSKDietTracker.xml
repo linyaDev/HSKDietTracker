@@ -48,6 +48,8 @@
 	<DT_SettingsLuxuryTip>Enable bonus points for consuming luxury items. Each filled slot gives +5 points on top of max score.</DT_SettingsLuxuryTip>
 	<DT_SettingsNoStack>Don't stack meals with different ingredients</DT_SettingsNoStack>
 	<DT_SettingsNoStackTip>Meals with different ingredients won't stack together. This preserves ingredient data and makes variety tracking more accurate.</DT_SettingsNoStackTip>
+	<DT_SettingsVarietyFallback>Cook monotonous food when variety runs out</DT_SettingsVarietyFallback>
+	<DT_SettingsVarietyFallbackTip>Affects the "monotonous food" bill filter. When variety ingredients run out, the cook will fall back to cooking from monotonous ingredients instead of standing idle.</DT_SettingsVarietyFallbackTip>
 	<DT_LuxuryLocked>Locked: tech level too low</DT_LuxuryLocked>
 	<DT_LuxAlcohol>Alcohol</DT_LuxAlcohol>
 	<DT_LuxDrinks>Drinks</DT_LuxDrinks>
