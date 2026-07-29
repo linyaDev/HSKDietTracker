@@ -16,7 +16,7 @@ public class HSKDietTrackerSettings : ModSettings
     public bool luxuryEnabled = true;
 
     // Prevent stacking meals with different ingredients
-    public bool preventMealStacking = true;
+    public bool preventMealStacking = false;
 
     // Window position
     public float windowX = -1f;
@@ -33,7 +33,7 @@ public class HSKDietTrackerSettings : ModSettings
         Scribe_Values.Look(ref epochIndustrial, "epochIndustrial", 70);
         Scribe_Values.Look(ref epochSpacer, "epochSpacer", 80);
         Scribe_Values.Look(ref luxuryEnabled, "luxuryEnabled", true);
-        Scribe_Values.Look(ref preventMealStacking, "preventMealStacking", true);
+        Scribe_Values.Look(ref preventMealStacking, "preventMealStacking", false);
         Scribe_Values.Look(ref windowX, "windowX", -1f);
         Scribe_Values.Look(ref windowY, "windowY", -1f);
         base.ExposeData();

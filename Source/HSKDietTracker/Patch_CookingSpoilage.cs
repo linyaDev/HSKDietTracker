@@ -79,7 +79,7 @@ public static class Patch_CookingSpoilage
 
     public static void Prefix(List<Thing> availableThings, Bill bill, IntVec3 rootCell, ref bool alreadySorted)
     {
-        if (!(HSKDietTrackerMod.Settings?.preventMealStacking ?? true))
+        if (!(HSKDietTrackerMod.Settings?.preventMealStacking ?? false))
             return;
         if (bill?.recipe?.workSkill != SkillDefOf.Cooking)
             return;
@@ -125,7 +125,7 @@ public static class Patch_CookingSpoilage
     {
         if (!__result)
             return;
-        if (!(HSKDietTrackerMod.Settings?.preventMealStacking ?? true))
+        if (!(HSKDietTrackerMod.Settings?.preventMealStacking ?? false))
             return;
         if (bill?.recipe?.workSkill != SkillDefOf.Cooking)
             return;

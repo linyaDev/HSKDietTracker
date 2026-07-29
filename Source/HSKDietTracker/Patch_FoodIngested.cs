@@ -37,7 +37,6 @@ public static class Patch_FoodIngested
         if (detected != null)
         {
             comp.RecordLuxury(ingester, mealDef, detected);
-            Log.Message("[HSKDietTracker] Auto-detected luxury: " + mealDef + " as " + detected);
             return;
         }
 

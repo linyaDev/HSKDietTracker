@@ -72,7 +72,6 @@ public static class LuxurySlotLoader
                     }
 
                     Categories.Add(cat);
-                    Log.Message("[HSKDietTracker] Luxury category loaded: " + cat.name + " (" + cat.items.Count + " items, " + cat.slots + " slots)");
                 }
             }
             catch (System.Exception e)

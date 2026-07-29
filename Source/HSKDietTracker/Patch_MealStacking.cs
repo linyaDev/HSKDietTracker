@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using RimWorld;
@@ -12,7 +13,7 @@ public static class Patch_MealStacking
     {
         if (!__result)
             return;
-        if (!(HSKDietTrackerMod.Settings?.preventMealStacking ?? true))
+        if (!(HSKDietTrackerMod.Settings?.preventMealStacking ?? false))
             return;
 
         var other = otherStack.TryGetComp<CompIngredients>();
@@ -23,21 +24,42 @@ public static class Patch_MealStacking
         if (__instance.ingredients.Count == 0 && other.ingredients.Count == 0)
             return;
 
-        // Different ingredient count → don't stack
-        if (__instance.ingredients.Count != other.ingredients.Count)
+        // Compare unique ingredient sets by defName (ignore duplicates)
+        var setA = new HashSet<string>(__instance.ingredients.Select(i => i.defName));
+        var setB = new HashSet<string>(other.ingredients.Select(i => i.defName));
+
+        // Combined unique ingredients must fit in 3 slots
+        var combined = new HashSet<string>(setA);
+        combined.UnionWith(setB);
+        if (combined.Count > 3)
         {
+            if (Prefs.DevMode)
+                Log.Message("[HSKDietTracker] NoStack: >3 combined | " + __instance.parent?.def?.defName
+                    + " stackLimit=" + (__instance.parent?.def?.stackLimit ?? 0)
+                    + " A(" + __instance.parent.stackCount + "): " + string.Join(", ", setA)
+                    + " B(" + otherStack.stackCount + "): " + string.Join(", ", setB));
             __result = false;
             return;
         }
 
-        // Same count but different ingredients → don't stack
-        for (int i = 0; i < __instance.ingredients.Count; i++)
+        // If ingredients fully match — always stack
+        if (setA.SetEquals(setB))
+            return;
+
+        // Different ingredients — check stack size tolerance
+        var def = __instance.parent?.def;
+        bool isMeal = def?.ingestible != null && def.ingestible.preferability >= FoodPreferability.MealAwful;
+        int tolerance = isMeal ? 1 : 10;
+
+        if (System.Math.Abs(__instance.parent.stackCount - otherStack.stackCount) > tolerance)
         {
-            if (!other.ingredients.Contains(__instance.ingredients[i]))
-            {
-                __result = false;
-                return;
-            }
+            if (Prefs.DevMode)
+                Log.Message("[HSKDietTracker] NoStack: size diff | " + __instance.parent?.def?.defName
+                    + " stackLimit=" + (__instance.parent?.def?.stackLimit ?? 0)
+                    + " A(" + __instance.parent.stackCount + "): " + string.Join(", ", setA)
+                    + " B(" + otherStack.stackCount + "): " + string.Join(", ", setB)
+                    + " | tolerance=" + tolerance);
+            __result = false;
         }
     }
 }
