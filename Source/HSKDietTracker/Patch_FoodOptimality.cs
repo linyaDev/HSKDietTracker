@@ -7,6 +7,9 @@ namespace HSKDietTracker;
 [HarmonyPatch(typeof(FoodUtility), nameof(FoodUtility.FoodOptimality))]
 public static class Patch_FoodOptimality
 {
+    private static readonly Verse.SimpleCurve MoodCurve =
+        (Verse.SimpleCurve)AccessTools.Field(typeof(FoodUtility), "FoodOptimalityEffectFromMoodCurve").GetValue(null);
+
     public static void Postfix(ref float __result, Pawn eater, Thing foodSource, ThingDef foodDef)
     {
         if (eater == null || !eater.IsColonist || foodDef == null)
@@ -15,6 +18,21 @@ public static class Patch_FoodOptimality
         var comp = Current.Game?.GetComponent<GameComponent_DietTracker>();
         if (comp == null)
             return;
+
+        // Meal quality must not attract pawns: cancel the positive ingest-thought
+        // bonuses vanilla just added (fine/lavish meal ~ +40) so the choice is driven
+        // by variety and spoilage only. Negative thoughts (awful meal, insect meat,
+        // rotten...) are kept so bad food is still avoided.
+        if (eater.needs?.mood != null && foodSource != null)
+        {
+            var thoughts = FoodUtility.ThoughtsFromIngesting(eater, foodSource, foodDef);
+            for (int i = 0; i < thoughts.Count; i++)
+            {
+                float mood = thoughts[i].thought.stages[0].baseMoodEffect;
+                if (mood > 0f)
+                    __result -= MoodCurve.Evaluate(mood);
+            }
+        }
 
         // Skip rotten food entirely
         if (foodSource != null)
