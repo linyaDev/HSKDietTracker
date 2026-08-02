@@ -291,12 +291,12 @@ public class MapComponent_DietOverlay : MapComponent
 
             foreach (var r in data.records)
             {
-                if (r.isMeal)
+                if (r.ingredients.Count > 0)
                 {
                     foreach (var ing in r.ingredients)
                         eaten.Add(ing);
                 }
-                else
+                else if (!r.isMeal)
                 {
                     eaten.Add(r.mealDef);
                 }

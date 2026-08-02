@@ -23,12 +23,20 @@ public static class Patch_FoodIngested
 
         string mealDef = __instance.def.defName;
 
+        var compIngredients = __instance.TryGetComp<CompIngredients>();
+        List<string> ingredients = compIngredients?.ingredients?
+            .Select(i => i.defName)
+            .ToList() ?? new List<string>();
+
         // Check luxury: first by XML list, then by auto-detection
         var techLevel = Faction.OfPlayer?.def?.techLevel ?? TechLevel.Neolithic;
         bool luxuryEnabled = (HSKDietTrackerMod.Settings?.luxuryEnabled ?? true) && techLevel > TechLevel.Neolithic;
         if (luxuryEnabled && LuxurySlotLoader.AllLuxuryDefNames.Contains(mealDef))
         {
             comp.RecordLuxury(ingester, mealDef);
+            // The item itself fills a luxury slot, but its ingredients still count
+            if (ingredients.Count > 0)
+                comp.RecordMeal(ingester, mealDef, false, ingredients);
             return;
         }
 
@@ -37,17 +45,14 @@ public static class Patch_FoodIngested
         if (detected != null)
         {
             comp.RecordLuxury(ingester, mealDef, detected);
+            if (ingredients.Count > 0)
+                comp.RecordMeal(ingester, mealDef, false, ingredients);
             return;
         }
 
         // Skip drugs, medicine, non-food
         if (__instance.def.IsDrug || __instance.def.ingestible.preferability <= FoodPreferability.NeverForNutrition)
             return;
-
-        var compIngredients = __instance.TryGetComp<CompIngredients>();
-        List<string> ingredients = compIngredients?.ingredients?
-            .Select(i => i.defName)
-            .ToList() ?? new List<string>();
 
         // Cooked meal = has ingredients AND preferability >= MealAwful (or is pemmican)
         bool isMeal = ingredients.Count > 0

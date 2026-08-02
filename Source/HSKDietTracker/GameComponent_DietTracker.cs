@@ -78,12 +78,14 @@ public class PawnDietData : IExposable
             var all = new HashSet<string>();
             foreach (var r in ValidRecords)
             {
-                if (r.isMeal)
+                // Records carrying ingredients (meals, luxury items) contribute those;
+                // plain raw food contributes itself
+                if (r.ingredients.Count > 0)
                 {
                     foreach (var ing in r.ingredients)
                         all.Add(ing);
                 }
-                else
+                else if (!r.isMeal)
                 {
                     all.Add(r.mealDef);
                 }
@@ -102,12 +104,14 @@ public class PawnDietData : IExposable
             var all = new HashSet<string>();
             foreach (var r in ValidRecords)
             {
-                if (r.isMeal)
+                // Records carrying ingredients (meals, luxury items) contribute those;
+                // plain raw food contributes itself
+                if (r.ingredients.Count > 0)
                 {
                     foreach (var ing in r.ingredients)
                         all.Add(ing);
                 }
-                else
+                else if (!r.isMeal)
                 {
                     all.Add(r.mealDef);
                 }

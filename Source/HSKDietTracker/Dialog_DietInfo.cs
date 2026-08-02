@@ -153,14 +153,17 @@ public class Dialog_DietInfo : Window
                 // Cooked meal — track as meal
                 if (!mealLatestTick.ContainsKey(r.mealDef) || r.tick > mealLatestTick[r.mealDef])
                     mealLatestTick[r.mealDef] = r.tick;
-                // Its ingredients
+            }
+            if (r.ingredients.Count > 0)
+            {
+                // Ingredients of meals and luxury items
                 foreach (var ing in r.ingredients)
                 {
                     if (!ingredientLatestTick.ContainsKey(ing) || r.tick > ingredientLatestTick[ing])
                         ingredientLatestTick[ing] = r.tick;
                 }
             }
-            else
+            else if (!r.isMeal)
             {
                 // Raw food — track as ingredient
                 if (!ingredientLatestTick.ContainsKey(r.mealDef) || r.tick > ingredientLatestTick[r.mealDef])
