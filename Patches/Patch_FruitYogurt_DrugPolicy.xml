@@ -4,11 +4,26 @@
 	     scheduled/limited there instead of being eaten as ordinary food. -->
 	<Operation Class="PatchOperationConditional">
 		<xpath>Defs/ThingDef[defName="FruitYogurt"]/ingestible</xpath>
-		<match Class="PatchOperationAdd">
-			<xpath>Defs/ThingDef[defName="FruitYogurt"]/ingestible</xpath>
-			<value>
-				<drugCategory>Social</drugCategory>
-			</value>
+		<match Class="PatchOperationSequence">
+			<operations>
+				<li Class="PatchOperationAdd">
+					<xpath>Defs/ThingDef[defName="FruitYogurt"]/ingestible</xpath>
+					<value>
+						<drugCategory>Social</drugCategory>
+					</value>
+				</li>
+				<!-- Vanilla sorts drug policy entries by CompProperties_Drug.listOrder,
+				     so every drug MUST have the comp or policy creation NREs. -->
+				<li Class="PatchOperationAdd">
+					<xpath>Defs/ThingDef[defName="FruitYogurt"]/comps</xpath>
+					<value>
+						<li Class="CompProperties_Drug">
+							<addictiveness>0</addictiveness>
+							<listOrder>1100</listOrder>
+						</li>
+					</value>
+				</li>
+			</operations>
 		</match>
 	</Operation>
 </Patch>
