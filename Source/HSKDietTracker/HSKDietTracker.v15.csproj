@@ -5,39 +5,63 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>12.0</LangVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>..\..\1.5\Assemblies</OutputPath>
+    <OutputPath>../../1.5/Assemblies</OutputPath>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <DefineConstants>V15</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup>
-    <RimWorldPath>D:\RimWorld_HSK_1.5</RimWorldPath>
+
+  <!-- Reference assemblies for .NET Framework 4.8, so the project builds on macOS/Linux too. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Game paths. Override from the command line with -p:RimWorldPath=... if your install differs. -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <RimWorldPath Condition="'$(RimWorldPath)' == ''">D:\RimWorld_HSK_1.5</RimWorldPath>
+    <RimWorldManaged Condition="'$(RimWorldManaged)' == ''">$(RimWorldPath)/RimWorldWin64_Data/Managed</RimWorldManaged>
+    <HarmonyAssembly Condition="'$(HarmonyAssembly)' == ''">$(RimWorldPath)/Mods/Harmony/Current/Assemblies/0Harmony.dll</HarmonyAssembly>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <RimWorldPath Condition="'$(RimWorldPath)' == ''">$(HOME)/Library/Application Support/Steam/steamapps/common/RimWorld</RimWorldPath>
+    <RimWorldManaged Condition="'$(RimWorldManaged)' == ''">$(RimWorldPath)/RimWorldMac.app/Contents/Resources/Data/Managed</RimWorldManaged>
+    <HarmonyAssembly Condition="'$(HarmonyAssembly)' == ''">$(HOME)/Library/Application Support/Steam/steamapps/workshop/content/294100/2009463077/Current/Assemblies/0Harmony.dll</HarmonyAssembly>
+  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="Assembly-CSharp" Publicize="true">
-      <HintPath>$(RimWorldPath)\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(RimWorldManaged)/Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(RimWorldPath)\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(RimWorldManaged)/UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(RimWorldPath)\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(RimWorldManaged)/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(RimWorldPath)\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(RimWorldManaged)/UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="0Harmony">
-      <HintPath>$(RimWorldPath)\Mods\Harmony\Current\Assemblies\0Harmony.dll</HintPath>
+      <HintPath>$(HarmonyAssembly)</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <Target Name="CheckGameAssemblies" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(RimWorldManaged)/Assembly-CSharp.dll')"
+           Text="RimWorld 1.5 assemblies not found at '$(RimWorldManaged)'. Pass -p:RimWorldPath=&lt;game folder&gt; or -p:RimWorldManaged=&lt;Managed folder&gt;." />
+    <Error Condition="!Exists('$(HarmonyAssembly)')"
+           Text="0Harmony.dll not found at '$(HarmonyAssembly)'. Pass -p:HarmonyAssembly=&lt;path to 0Harmony.dll&gt;." />
+  </Target>
 </Project>
