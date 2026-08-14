@@ -6,34 +6,49 @@ using Verse;
 namespace HSKDietTracker;
 
 /// <summary>
-/// Cached diet-filter state: per-colonist "eaten in the last 7 days" sets, and the current
-/// "top 3" ingredient keys — the 3 ingredients available on the map that the fewest colonists
-/// have eaten (i.e. the best for diet variety). Refreshed periodically so the bill ingredient
-/// filter stays cheap.
+/// Cached diet-filter state: per-colonist "eaten in the last 7 days" sets, and "top 3"
+/// ingredient keys — the 3 ingredients available on the map that the fewest colonists
+/// have eaten (i.e. the best for diet variety). When a bill ingredient search is running,
+/// the top-3 is computed only among ingredients that bill's filters accept (soup gets a
+/// vegetable top-3, not fruits it can't use). Refreshed periodically to stay cheap.
 /// </summary>
 internal static class DietFilterState
 {
-    private static readonly List<HashSet<string>> colonistEaten = new List<HashSet<string>>();
+    private static readonly List<(Pawn pawn, HashSet<string> eaten)> colonistEaten = new List<(Pawn, HashSet<string>)>();
     private static HashSet<string> top3Meat = new HashSet<string>();
     private static HashSet<string> top3Veg = new HashSet<string>();
-    private static int lastTick = -999999;
+    private static int lastEatenTick = -999999;
+    private static int lastGlobalTick = -999999;
     private const int Interval = 200; // ~5 in-game minutes
     private const int TopN = 3;
     // Below this total stock an ingredient can't realistically be cooked into a meal,
     // so it shouldn't waste one of the variety slots.
     private const int MinCookableCount = 10;
 
-    private static void Ensure()
+    // ==== Bill context (set around WorkGiver_DoBill.TryFindBestBillIngredients) ====
+
+    private static Bill contextBill;
+
+    public static void SetContextBill(Bill bill) => contextBill = bill;
+
+    private class BillTop3
+    {
+        public int tick = -999999;
+        public HashSet<string> meat = new HashSet<string>();
+        public HashSet<string> veg = new HashSet<string>();
+        public string lastLogKey;
+    }
+
+    private static readonly Dictionary<Bill, BillTop3> billCache = new Dictionary<Bill, BillTop3>();
+
+    private static void EnsureEaten()
     {
         int tick = Find.TickManager?.TicksGame ?? 0;
-        if (lastTick >= 0 && tick - lastTick < Interval)
+        if (lastEatenTick >= 0 && tick - lastEatenTick < Interval)
             return;
-        lastTick = tick;
+        lastEatenTick = tick;
 
         colonistEaten.Clear();
-        top3Meat = new HashSet<string>();
-        top3Veg = new HashSet<string>();
-
         var comp = Current.Game?.GetComponent<GameComponent_DietTracker>();
         if (comp == null)
             return;
@@ -42,13 +57,35 @@ internal static class DietFilterState
         {
             if (p == null || p.IsQuestLodger())
                 continue;
-            colonistEaten.Add(comp.GetData(p).RecentEatenSet);
+            colonistEaten.Add((p, comp.GetData(p).RecentEatenSet));
         }
+    }
 
-        // Tally how much of each ingredient is available to cooks on the map, keeping meat and
-        // vegetables apart so each category gets its own variety slots.
-        var meatCount = new Dictionary<string, int>();
-        var vegCount = new Dictionary<string, int>();
+    /// <summary>
+    /// The "eaten by" sets that matter for a dish: only colonists whose food restriction
+    /// allows the produced meal. Colonists who can't eat the dish must not influence
+    /// which ingredients count as variety for it. Falls back to everyone.
+    /// </summary>
+    private static List<HashSet<string>> RelevantEatenSets(ThingDef producedDef)
+    {
+        var all = new List<HashSet<string>>();
+        var restricted = producedDef == null ? null : new List<HashSet<string>>();
+        foreach (var (pawn, eaten) in colonistEaten)
+        {
+            all.Add(eaten);
+            if (restricted != null && (pawn.foodRestriction?.CurrentFoodPolicy?.Allows(producedDef) ?? true))
+                restricted.Add(eaten);
+        }
+        return restricted != null && restricted.Count > 0 ? restricted : all;
+    }
+
+    /// <summary>
+    /// Tally map stock of raw ingredients, meat and vegetables apart so each category
+    /// gets its own variety slots. `allowed` restricts the tally (bill filters).
+    /// </summary>
+    private static void Tally(System.Predicate<ThingDef> allowed,
+        Dictionary<string, int> meatCount, Dictionary<string, int> vegCount)
+    {
         var maps = Find.Maps;
         for (int i = 0; i < maps.Count; i++)
         {
@@ -58,6 +95,8 @@ internal static class DietFilterState
             foreach (var thing in map.listerThings.ThingsInGroup(ThingRequestGroup.FoodSourceNotPlantOrTree))
             {
                 if (!IsRawIngredient(thing.def))
+                    continue;
+                if (allowed != null && !allowed(thing.def))
                     continue;
                 // Forbidden stock can't be cooked with, so it mustn't occupy a variety slot
                 if (thing.IsForbidden(Faction.OfPlayer))
@@ -70,19 +109,111 @@ internal static class DietFilterState
                 }
             }
         }
-
-        // Top-N per category (meat, vegetables): the ingredients eaten by the fewest colonists,
-        // limited to those with enough stock to actually cook with (ties broken by name).
-        AddTopN(meatCount, top3Meat);
-        AddTopN(vegCount, top3Veg);
     }
 
-    private static void AddTopN(Dictionary<string, int> counts, HashSet<string> dest)
+    private static void EnsureGlobal()
+    {
+        int tick = Find.TickManager?.TicksGame ?? 0;
+        if (lastGlobalTick >= 0 && tick - lastGlobalTick < Interval)
+            return;
+        lastGlobalTick = tick;
+
+        EnsureEaten();
+        top3Meat = new HashSet<string>();
+        top3Veg = new HashSet<string>();
+
+        var meatCount = new Dictionary<string, int>();
+        var vegCount = new Dictionary<string, int>();
+        Tally(null, meatCount, vegCount);
+
+        var eatenSets = AllEatenSets();
+        AddTopN(meatCount, top3Meat, eatenSets);
+        AddTopN(vegCount, top3Veg, eatenSets);
+
+        DebugLogState(meatCount, vegCount, eatenSets);
+    }
+
+    /// <summary>Top-3 restricted to what this bill's filters accept (def level).</summary>
+    private static BillTop3 GetBillTop3(Bill bill)
+    {
+        int tick = Find.TickManager?.TicksGame ?? 0;
+        if (!billCache.TryGetValue(bill, out var bt))
+        {
+            if (billCache.Count > 20)
+                billCache.Clear(); // bills come and go; drop stale entries wholesale
+            bt = new BillTop3();
+            billCache[bill] = bt;
+        }
+        if (tick - bt.tick < Interval)
+            return bt;
+        bt.tick = tick;
+
+        EnsureEaten();
+        bt.meat.Clear();
+        bt.veg.Clear();
+
+        var fixedFilter = bill.recipe?.fixedIngredientFilter;
+        var billFilter = bill.ingredientFilter;
+        var meatCount = new Dictionary<string, int>();
+        var vegCount = new Dictionary<string, int>();
+        // Def-level Allows only — it doesn't consult special filter workers, no recursion
+        Tally(def => (fixedFilter == null || fixedFilter.Allows(def))
+                     && (billFilter == null || billFilter.Allows(def)),
+            meatCount, vegCount);
+
+        // Variety is judged by the colonists who are actually allowed to eat this dish
+        var eatenSets = RelevantEatenSets(bill.recipe?.ProducedThingDef);
+        AddTopN(meatCount, bt.meat, eatenSets);
+        AddTopN(vegCount, bt.veg, eatenSets);
+
+        if (Prefs.DevMode)
+        {
+            string key = "top3Meat=[" + string.Join(", ", bt.meat.OrderBy(k => k))
+                + "] top3Veg=[" + string.Join(", ", bt.veg.OrderBy(k => k))
+                + "] colonists=" + eatenSets.Count + "/" + colonistEaten.Count;
+            if (key != bt.lastLogKey)
+            {
+                bt.lastLogKey = key;
+                Log.Message("[HSKDietTracker] VarietyFilter bill '" + bill.Label + "': " + key);
+            }
+        }
+        return bt;
+    }
+
+    private static string lastDebugKey;
+
+    private static void DebugLogState(Dictionary<string, int> meatCount, Dictionary<string, int> vegCount, List<HashSet<string>> eatenSets)
+    {
+        if (!Prefs.DevMode)
+            return;
+
+        bool fb = HSKDietTrackerMod.Settings?.varietyFilterFallback ?? false;
+        string key = "top3Meat=[" + string.Join(", ", top3Meat.OrderBy(k => k))
+            + "] top3Veg=[" + string.Join(", ", top3Veg.OrderBy(k => k))
+            + "] fallbackSetting=" + fb;
+        if (key == lastDebugKey)
+            return;
+        lastDebugKey = key;
+
+        string Stock(Dictionary<string, int> counts) => counts.Count == 0
+            ? "(empty)"
+            : string.Join(", ", counts
+                .OrderBy(kv => EatenByCount(kv.Key, eatenSets)).ThenBy(kv => kv.Key)
+                .Select(kv => kv.Key + " x" + kv.Value
+                    + (kv.Value < MinCookableCount ? " (<" + MinCookableCount + ", skip)" : "")
+                    + " eatenBy " + EatenByCount(kv.Key, eatenSets) + "/" + eatenSets.Count));
+
+        Log.Message("[HSKDietTracker] VarietyFilter (global): " + key
+            + "\n  meat stock: " + Stock(meatCount)
+            + "\n  veg stock: " + Stock(vegCount));
+    }
+
+    private static void AddTopN(Dictionary<string, int> counts, HashSet<string> dest, List<HashSet<string>> eatenSets)
     {
         foreach (var key in counts
             .Where(kv => kv.Value >= MinCookableCount)
             .Select(kv => kv.Key)
-            .OrderBy(EatenByCount)
+            .OrderBy(k => EatenByCount(k, eatenSets))
             .ThenBy(k => k)
             .Take(TopN))
         {
@@ -90,15 +221,23 @@ internal static class DietFilterState
         }
     }
 
-    private static int EatenByCount(string key)
+    private static int EatenByCount(string key, List<HashSet<string>> eatenSets)
     {
         int n = 0;
-        foreach (var set in colonistEaten)
+        foreach (var set in eatenSets)
         {
             if (set.Contains(key))
                 n++;
         }
         return n;
+    }
+
+    private static List<HashSet<string>> AllEatenSets()
+    {
+        var all = new List<HashSet<string>>(colonistEaten.Count);
+        foreach (var (_, eaten) in colonistEaten)
+            all.Add(eaten);
+        return all;
     }
 
     public static bool IsRawIngredient(ThingDef def)
@@ -142,20 +281,8 @@ internal static class DietFilterState
     /// <summary>True if this ingredient key is one of the current top-3 variety ingredients.</summary>
     public static bool IsTop3Key(string key)
     {
-        Ensure();
+        EnsureGlobal();
         return key != null && (top3Meat.Contains(key) || top3Veg.Contains(key));
-    }
-
-    /// <summary>
-    /// True if the variety filter should stop excluding this def's category because no variety
-    /// ingredients are left in it (fallback: cook from whatever is available).
-    /// </summary>
-    public static bool FallbackActive(ThingDef def)
-    {
-        if (!(HSKDietTrackerMod.Settings?.varietyFilterFallback ?? false))
-            return false;
-        Ensure();
-        return def.IsMeat ? top3Meat.Count == 0 : top3Veg.Count == 0;
     }
 
     /// <summary>
@@ -164,13 +291,14 @@ internal static class DietFilterState
     /// </summary>
     public static string DebugTop3Summary()
     {
-        Ensure();
+        EnsureGlobal();
         if (top3Meat.Count == 0 && top3Veg.Count == 0)
             return "(none)";
+        var eatenSets = AllEatenSets();
         return string.Join(", ", top3Meat.Concat(top3Veg)
-            .OrderBy(EatenByCount)
+            .OrderBy(k => EatenByCount(k, eatenSets))
             .ThenBy(k => k)
-            .Select(k => k + " (eaten by " + EatenByCount(k) + ")"));
+            .Select(k => k + " (eaten by " + EatenByCount(k, eatenSets) + ")"));
     }
 
     /// <summary>True if this stack provides one of the current top-3 variety ingredients.</summary>
@@ -178,8 +306,20 @@ internal static class DietFilterState
     {
         if (t?.def == null)
             return false;
-        Ensure();
-        var top3 = t.def.IsMeat ? top3Meat : top3Veg;
+
+        HashSet<string> top3;
+        if (contextBill != null)
+        {
+            // Inside a bill ingredient search: variety is judged among what THIS bill accepts
+            var bt = GetBillTop3(contextBill);
+            top3 = t.def.IsMeat ? bt.meat : bt.veg;
+        }
+        else
+        {
+            EnsureGlobal();
+            top3 = t.def.IsMeat ? top3Meat : top3Veg;
+        }
+
         if (top3.Count == 0)
             return false;
         foreach (var key in IngredientKeys(t))
@@ -197,12 +337,26 @@ internal static class DietFilterState
 /// </summary>
 public class SpecialThingFilterWorker_RecentlyEaten : SpecialThingFilterWorker
 {
+    private static int lastAliveLogTick = -99999;
+
     public override bool Matches(Thing t)
     {
-        if (t?.def == null || !DietFilterState.IsRawIngredient(t.def))
+        // Heartbeat: proves bills actually consult this filter (only unchecked filters are asked)
+        if (Prefs.DevMode)
+        {
+            int tick = Find.TickManager?.TicksGame ?? 0;
+            if (tick - lastAliveLogTick > 2500)
+            {
+                lastAliveLogTick = tick;
+                Log.Message("[HSKDietTracker] VarietyFilter.Matches is being consulted (thing=" + t?.def?.defName + ")");
+            }
+        }
+
+        // Retry pass after a failed ingredient search — the variety filter yields
+        if (Patch_VarietyFallback.Bypass)
             return false;
-        // Variety ran out in this category — treat nothing as monotonous so the cook keeps cooking
-        if (DietFilterState.FallbackActive(t.def))
+
+        if (t?.def == null || !DietFilterState.IsRawIngredient(t.def))
             return false;
         return !DietFilterState.ProvidesTop3(t);
     }
