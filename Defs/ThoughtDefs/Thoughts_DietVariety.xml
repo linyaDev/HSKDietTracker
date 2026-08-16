@@ -7,22 +7,22 @@
 			<li>
 				<label>starving diet</label>
 				<description>The same disgusting slop every day. I can barely force it down anymore.</description>
-				<baseMoodEffect>-16</baseMoodEffect>
+				<baseMoodEffect>-12</baseMoodEffect>
 			</li>
 			<li>
 				<label>meager diet</label>
 				<description>I've been eating the same slop over and over. It's depressing.</description>
-				<baseMoodEffect>-12</baseMoodEffect>
+				<baseMoodEffect>-8</baseMoodEffect>
 			</li>
 			<li>
 				<label>poor diet</label>
 				<description>There's barely any variety in what I eat. So boring.</description>
-				<baseMoodEffect>-8</baseMoodEffect>
+				<baseMoodEffect>-4</baseMoodEffect>
 			</li>
 			<li>
 				<label>monotonous diet</label>
 				<description>The food is getting repetitive. I wish for something different.</description>
-				<baseMoodEffect>-4</baseMoodEffect>
+				<baseMoodEffect>-2</baseMoodEffect>
 			</li>
 			<li>
 				<label>ordinary diet</label>
