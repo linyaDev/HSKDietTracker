@@ -47,7 +47,7 @@ public class PawnDietData : IExposable
     public const int MealWeight = 2;
     public const int IngredientWeight = 3;
     private const int SevenDaysTicks = 420000;
-    public const int GracePeriodTicks = 180000; // 3 days
+    public const int GracePeriodTicks = 600000; // 10 days
 
     private IEnumerable<DietRecord> ValidRecords
     {

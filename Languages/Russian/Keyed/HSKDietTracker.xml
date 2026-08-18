@@ -36,7 +36,7 @@
 	<DT_OverlayToggle>Подсветка диеты: показать животных, мясо которых колонисты ещё не ели</DT_OverlayToggle>
 	<DT_AllBiomes>Настроенные бонусы биомов:</DT_AllBiomes>
 	<DT_GracePeriod>Адаптация ({0} дн.)</DT_GracePeriod>
-	<DT_GracePeriodTooltip>Этот колонист недавно прибыл. Штраф к настроению от диеты снижен на 3 дня, пока он привыкает к еде колонии.</DT_GracePeriodTooltip>
+	<DT_GracePeriodTooltip>Этот колонист недавно прибыл. Штраф к настроению от диеты снижен на 10 дней, пока он привыкает к еде колонии.</DT_GracePeriodTooltip>
 	<DT_SmallColony>Нас слишком мало, не до изысков</DT_SmallColony>
 	<DT_SmallColonyTooltip>В колонии меньше 3 человек. Штрафы и бонусы от диеты не действуют.</DT_SmallColonyTooltip>
 	<DT_IngredientsTip>Ингредиенты:</DT_IngredientsTip>

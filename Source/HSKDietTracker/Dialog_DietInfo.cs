@@ -513,7 +513,23 @@ public class Dialog_DietInfo : Window
         return y + LuxCellSize + LuxCellPadding;
     }
 
-    private static readonly int[] DietMoods = { -16, -12, -8, -4, 0, 2, 4, 6 };
+    // Mood values come from the DietVarietyThought def so the bar always matches the XML
+    private static int[] dietMoodsCache;
+    private static int[] DietMoods
+    {
+        get
+        {
+            if (dietMoodsCache == null)
+            {
+                var def = DefDatabase<ThoughtDef>.GetNamedSilentFail("DietVarietyThought");
+                if (def?.stages != null && def.stages.Count == DietStageKeys.Length)
+                    dietMoodsCache = def.stages.Select(s => (int)s.baseMoodEffect).ToArray();
+                else
+                    dietMoodsCache = new[] { -12, -8, -4, -2, 0, 2, 4, 6 };
+            }
+            return dietMoodsCache;
+        }
+    }
     private static readonly float[] DietThresholds = { 0.10f, 0.20f, 0.30f, 0.42f, 0.57f, 0.71f, 0.85f, 1.0f };
     private static readonly Color[] DietColors =
     {

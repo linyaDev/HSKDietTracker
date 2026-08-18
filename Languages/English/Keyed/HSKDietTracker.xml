@@ -36,7 +36,7 @@
 	<DT_OverlayToggle>Toggle diet overlay: highlight animals whose meat your colonists haven't eaten</DT_OverlayToggle>
 	<DT_AllBiomes>Configured biome bonuses:</DT_AllBiomes>
 	<DT_GracePeriod>Adapting ({0}d left)</DT_GracePeriod>
-	<DT_GracePeriodTooltip>This colonist recently arrived. Diet mood penalty is reduced for 3 days while they adapt to the colony's food.</DT_GracePeriodTooltip>
+	<DT_GracePeriodTooltip>This colonist recently arrived. Diet mood penalty is reduced for 10 days while they adapt to the colony's food.</DT_GracePeriodTooltip>
 	<DT_SmallColony>Too few of us to be picky about food</DT_SmallColony>
 	<DT_SmallColonyTooltip>Colony has fewer than 3 people. Diet mood penalties and bonuses are disabled.</DT_SmallColonyTooltip>
 	<DT_IngredientsTip>Ingredients:</DT_IngredientsTip>
