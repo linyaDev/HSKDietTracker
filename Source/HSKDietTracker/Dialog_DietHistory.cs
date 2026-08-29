@@ -28,6 +28,8 @@ public class Dialog_DietHistory : Window
         doCloseX = true;
         draggable = true;
         absorbInputAroundWindow = false;
+        preventCameraMotion = false; // keep WASD/edge camera movement while open
+        focusWhenOpened = false;
     }
 
     public override void SetInitialSizeAndPosition()

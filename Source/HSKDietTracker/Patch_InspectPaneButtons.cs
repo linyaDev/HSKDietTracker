@@ -28,23 +28,49 @@ public static class Patch_InspectPaneButtons
         }
     }
 
-    public static void Postfix(Rect rect, ref float lineEndWidth)
+    public static bool CanShow(Pawn pawn)
     {
-        if (Find.Selector.NumSelected != 1)
-            return;
-        if (!(Find.Selector.SingleSelectedThing is Pawn pawn))
-            return;
-        if (!pawn.IsColonist || pawn.IsQuestLodger())
-            return;
+        return pawn != null && pawn.IsColonist && !pawn.IsQuestLodger();
+    }
 
-        float x = rect.width - 48f - lineEndWidth;
-        var btnRect = new Rect(x + 2f, 1.5f, 20f, 20f);
+    public static void DrawButton(Pawn pawn, Rect btnRect)
+    {
         MouseoverSounds.DoRegion(btnRect);
         TooltipHandler.TipRegion(btnRect, "DT_Title".Translate());
         if (Widgets.ButtonImage(btnRect, Icon))
         {
             Find.WindowStack.Add(new Dialog_DietInfo(pawn));
         }
+    }
+
+    public static void Postfix(Rect rect, ref float lineEndWidth)
+    {
+        if (Find.Selector.NumSelected != 1)
+            return;
+        if (!(Find.Selector.SingleSelectedThing is Pawn pawn) || !CanShow(pawn))
+            return;
+
+        float x = rect.width - 48f - lineEndWidth;
+        DrawButton(pawn, new Rect(x + 2f, 1.5f, 20f, 20f));
         lineEndWidth += 24f;
+    }
+}
+
+/// <summary>
+/// RimHUD replaces the vanilla inspect pane, so the DoInspectPaneButtons postfix
+/// never draws there. Applied manually (reflection) when RimHUD is loaded — see
+/// HSKDietTrackerInit. Target: RimHUD.Interface.Screen.InspectPaneButtons.Draw.
+/// </summary>
+public static class Patch_RimHUDInspectPaneButtons
+{
+    public static void Postfix(Rect bounds, ref float offset)
+    {
+        if (!(Find.Selector.SingleSelectedThing is Pawn pawn) || !Patch_InspectPaneButtons.CanShow(pawn))
+            return;
+
+        offset += 20f;
+        var btnRect = new Rect(bounds.xMax - offset, bounds.y + (bounds.height - 20f) / 2f, 20f, 20f);
+        offset += 4f;
+        Patch_InspectPaneButtons.DrawButton(pawn, btnRect);
     }
 }
