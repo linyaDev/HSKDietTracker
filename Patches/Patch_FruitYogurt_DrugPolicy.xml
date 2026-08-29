@@ -12,6 +12,13 @@
 						<drugCategory>Social</drugCategory>
 					</value>
 				</li>
+				<!-- Like Chocolate/Caramel: never eaten for hunger, only via drug policy / joy -->
+				<li Class="PatchOperationReplace">
+					<xpath>Defs/ThingDef[defName="FruitYogurt"]/ingestible/preferability</xpath>
+					<value>
+						<preferability>DesperateOnly</preferability>
+					</value>
+				</li>
 				<!-- Vanilla sorts drug policy entries by CompProperties_Drug.listOrder,
 				     so every drug MUST have the comp or policy creation NREs. -->
 				<li Class="PatchOperationAdd">
