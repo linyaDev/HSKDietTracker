@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Diet Tracker: Luxury slot definitions.
+    Each filled slot adds pointsPerSlot to score (on top of max).
+    slots = how many unique items needed to fill all slots in category.
+    Items listed here are NOT counted as regular food/ingredients.
+-->
+<LuxuryCategories>
+    <Category name="Alcohol" labelKey="DT_LuxAlcohol" slots="1" pointsPerSlot="5">
+        <Item>Beer</Item>
+        <Item>cider</Item>
+        <Item>rum</Item>
+        <Item>Wine</Item>
+        <Item>strawberrywine</Item>
+        <Item>saki</Item>
+        <Item>vodka</Item>
+        <Item>tequila</Item>
+        <Item>whisky</Item>
+        <Item>Moonshine</Item>
+        <Item>Gin</Item>
+        <Item>Brandy</Item>
+        <Item>Cognac</Item>
+        <Item>Kahlua</Item>
+        <Item>Arak</Item>
+        <Item>Applejack</Item>
+    </Category>
+    <Category name="Drinks" labelKey="DT_LuxDrinks" slots="1" pointsPerSlot="5">
+        <Item>Cuptea</Item>
+        <Item>CupCoffee</Item>
+        <Item>PsychiteTea</Item>
+        <Item>HerbalTea</Item>
+        <Item>FruitDrink</Item>
+        <Item>FruitYogurt</Item>
+        <Item>Chocomilk</Item>
+    </Category>
+    <Category name="Sweets" labelKey="DT_LuxSweets" slots="1" pointsPerSlot="5">
+        <Item>IceCream</Item>
+        <Item>cookie</Item>
+        <Item>Taffy</Item>
+        <Item>Caramel</Item>
+        <Item>SweetBun</Item>
+        <Item>PieBlueberry</Item>
+        <Item>Chocolate</Item>
+    </Category>
+    <Category name="Smoking" labelKey="DT_LuxSmoking" slots="1" pointsPerSlot="5">
+        <Item>TobaccoCigarette</Item>
+        <Item>TobaccoCigar</Item>
+        <Item>TobaccoCigarChocolate</Item>
+        <Item>SmokeleafJoint</Item>
+    </Category>
+</LuxuryCategories>

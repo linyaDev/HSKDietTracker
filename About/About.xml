@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>HSK Diet Tracker</name>
+	<author>linyaDev</author>
+	<supportedVersions>
+		<li>1.5</li>
+		<li>1.6</li>
+		<li>1.7</li>
+	</supportedVersions>
+	<packageId>linya.hskdiettracker</packageId>
+	<modVersion>1.0.6</modVersion>
+	<description>
+[English]
+7-day food variety tracker. Colonists remember what they ate and want diverse food. Variety boosts mood (+6), monotony penalizes heavily (up to -16). New colonists get a 3-day grace period. Required variety scales with tech level and biome.
+
+[Russian]
+Трекер разнообразия еды за 7 дней. Колонисты запоминают что ели и хотят разнообразную еду. Разнообразие повышает настроение (+6), однообразие сильно ухудшает (до -16). Новые колонисты получают 3 дня адаптации. Требуемое разнообразие зависит от уровня технологий и биома.
+	</description>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>Ludeon.RimWorld</li>
+	</loadAfter>
+</ModMetaData>

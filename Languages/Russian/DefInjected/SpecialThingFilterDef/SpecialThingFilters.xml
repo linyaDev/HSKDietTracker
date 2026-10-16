@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <HSKDT_AllowRecentlyEaten.label>разрешить однообразную еду</HSKDT_AllowRecentlyEaten.label>
+  <HSKDT_AllowRecentlyEaten.description>При запрете повар будет готовить только из новых ингредиентов, которые колонисты ещё не ели. Это помогает разнообразить рацион колонии.</HSKDT_AllowRecentlyEaten.description>
+
+</LanguageData>

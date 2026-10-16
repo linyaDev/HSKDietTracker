@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<DT_Title>Diet History</DT_Title>
+	<DT_Meals>Meals</DT_Meals>
+	<DT_Ingredients>Ingredients</DT_Ingredients>
+	<DT_ScoreLabel>Score</DT_ScoreLabel>
+	<DT_TipStats>Unique meals: {0}  |  Unique ingredients: {1}  |  Score: {2}</DT_TipStats>
+	<DT_TipStatsShort>Unique meals: {0}  |  Unique ingredients: {1}</DT_TipStatsShort>
+	<DT_Today>today</DT_Today>
+	<DT_DaysAgo>{0}d ago</DT_DaysAgo>
+	<DT_RecentMeals>Meals: {0} (+2 pt.)</DT_RecentMeals>
+	<DT_RecentIngredients>Ingredients: {0} (+3 pt.)</DT_RecentIngredients>
+	<DT_LastEaten>Last eaten:</DT_LastEaten>
+	<DT_ExpiresIn>Expires in {0}</DT_ExpiresIn>
+	<DT_Stage0>starving diet</DT_Stage0>
+	<DT_Stage1>meager diet</DT_Stage1>
+	<DT_Stage2>poor diet</DT_Stage2>
+	<DT_Stage3>monotonous diet</DT_Stage3>
+	<DT_Stage4>ordinary diet</DT_Stage4>
+	<DT_Stage5>good diet</DT_Stage5>
+	<DT_Stage6>varied diet</DT_Stage6>
+	<DT_Stage7>magnificent diet</DT_Stage7>
+	<DT_NextLevel>next: {0} pts</DT_NextLevel>
+	<DT_SettingsCategory>Diet Tracker</DT_SettingsCategory>
+	<DT_SettingsEpoch>Max score by tech level</DT_SettingsEpoch>
+	<DT_EpochNeolithic>Neolithic</DT_EpochNeolithic>
+	<DT_EpochMedieval>Medieval</DT_EpochMedieval>
+	<DT_EpochIndustrial>Industrial</DT_EpochIndustrial>
+	<DT_EpochSpacer>Spacer+</DT_EpochSpacer>
+	<DT_SettingsBiome>Biome bonus</DT_SettingsBiome>
+	<DT_CurrentBiome>Current biome</DT_CurrentBiome>
+	<DT_FormulaInfo>Epoch: {0} + Biome: {1} = Max: {2}, Neutral: {3}</DT_FormulaInfo>
+	<DT_NoBiome>Biome unavailable (no map)</DT_NoBiome>
+	<DT_OverlayOn>Show animals</DT_OverlayOn>
+	<DT_OverlayOff>Hide animals</DT_OverlayOff>
+	<DT_OverlayToggle>Toggle diet overlay: highlight animals whose meat your colonists haven't eaten</DT_OverlayToggle>
+	<DT_AllBiomes>Configured biome bonuses:</DT_AllBiomes>
+	<DT_GracePeriod>Adapting ({0}d left)</DT_GracePeriod>
+	<DT_GracePeriodTooltip>This colonist recently arrived. Diet mood penalty is reduced for 10 days while they adapt to the colony's food.</DT_GracePeriodTooltip>
+	<DT_SmallColony>Too few of us to be picky about food</DT_SmallColony>
+	<DT_SmallColonyTooltip>Colony has fewer than 3 people. Diet mood penalties and bonuses are disabled.</DT_SmallColonyTooltip>
+	<DT_IngredientsTip>Ingredients:</DT_IngredientsTip>
+	<DT_HistoryBtn>History</DT_HistoryBtn>
+	<DT_Luxury>Luxury</DT_Luxury>
+	<DT_LuxurySlots>Luxury slots: (+5 pt. each)</DT_LuxurySlots>
+	<DT_LuxuryItems>Items:</DT_LuxuryItems>
+	<DT_SettingsLuxury>Luxury slots (alcohol, drinks, sweets, smoking)</DT_SettingsLuxury>
+	<DT_SettingsLuxuryTip>Enable bonus points for consuming luxury items. Each filled slot gives +5 points on top of max score.</DT_SettingsLuxuryTip>
+	<DT_SettingsNoStack>Don't stack meals with different ingredients</DT_SettingsNoStack>
+	<DT_SettingsNoStackTip>Meals with different ingredients won't stack together. This preserves ingredient data and makes variety tracking more accurate.</DT_SettingsNoStackTip>
+	<DT_SettingsVarietyFallback>Cook monotonous food when variety runs out</DT_SettingsVarietyFallback>
+	<DT_SettingsVarietyFallbackTip>Affects the "monotonous food" bill filter. When variety ingredients run out, the cook will fall back to cooking from monotonous ingredients instead of standing idle.</DT_SettingsVarietyFallbackTip>
+	<DT_LuxuryLocked>Locked: tech level too low</DT_LuxuryLocked>
+	<DT_LuxAlcohol>Alcohol</DT_LuxAlcohol>
+	<DT_LuxDrinks>Drinks</DT_LuxDrinks>
+	<DT_LuxSweets>Sweets</DT_LuxSweets>
+	<DT_LuxSmoking>Smoking</DT_LuxSmoking>
+</LanguageData>

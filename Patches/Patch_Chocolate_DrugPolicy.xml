@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+	<!-- Make Chocolate a social drug so it appears in drug policies.
+	     HSK Core already gives it CompProperties_Drug (addictiveness 0); we only add
+	     the category and a listOrder so it sorts near the other social treats.
+	     Guarded on the comp existing - a drugCategory without CompProperties_Drug
+	     crashes DrugPolicy.InitializeIfNeeded. -->
+	<Operation Class="PatchOperationConditional">
+		<xpath>Defs/ThingDef[defName="Chocolate"]/comps/li[@Class="CompProperties_Drug"]</xpath>
+		<match Class="PatchOperationSequence">
+			<operations>
+				<li Class="PatchOperationAdd">
+					<xpath>Defs/ThingDef[defName="Chocolate"]/ingestible</xpath>
+					<value>
+						<drugCategory>Social</drugCategory>
+					</value>
+				</li>
+				<li Class="PatchOperationAdd">
+					<xpath>Defs/ThingDef[defName="Chocolate"]/comps/li[@Class="CompProperties_Drug"]</xpath>
+					<value>
+						<listOrder>1300</listOrder>
+					</value>
+				</li>
+			</operations>
+		</match>
+	</Operation>
+</Patch>
