@@ -10,7 +10,7 @@
     <DefineConstants>V16</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
-    <RimWorldPath>D:\RimWorld_HSK</RimWorldPath>
+    <RimWorldPath>D:\SteamLibrary\steamapps\common\RimWorld</RimWorldPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp" Publicize="true">

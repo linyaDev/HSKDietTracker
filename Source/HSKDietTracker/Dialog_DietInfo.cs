@@ -287,7 +287,7 @@ public class Dialog_DietInfo : Window
                 int tLeft = kvp.Value + SevenDaysTicks - now;
                 int dLeft = tLeft / 60000;
                 int hLeft = (tLeft % 60000) / 2500;
-                string timeLeft = dLeft > 0 ? dLeft + " " + "FT_Days".Translate() : hLeft + "h";
+                string timeLeft = dLeft > 0 ? dLeft + " " + "DT_Days".Translate() : hLeft + "h";
                 TooltipHandler.TipRegion(iconRect, def.LabelCap + "\n" + "DT_ExpiresIn".Translate(timeLeft));
             }
 
